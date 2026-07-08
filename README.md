@@ -1,6 +1,6 @@
 # xxGemma
 
-<!-- Time-stamp: "2026-07-08T19:19:24Z" -->
+<!-- Time-stamp: "2026-07-08T19:25:20Z" -->
 
 **現在、建設中！**
 
@@ -81,6 +81,8 @@ http://jrf.cocolog-nifty.com/statuses/2024/09/post-a48170.html
 また、私の[グローバル共有メモ](http://jrockford.s1010.xrea.com/demo/shared_memo.cgi?cmd=log)では、2025-07-09T04:25:28Z に次のように述べている。
 
 > xxLLM というものを昔考えていた。JSON を出力するプログラムを出力する LLM。ただ、Artifact や Canvas を出力するのはそれにすでに近い。メタ的な要素を持っていると思う。xxLLM というものはだからもうすでにいらなくなっているのかもしれない。それはすでに巨大 LLM の内部にはロジックとしてあるのだろう。
+
+元々は、xxLLM は GPT2 レベルで試験的に実装するつもりでいたのだが、斎藤康毅『[ゼロから作るDeep Learning 6 - LLM編](https://www.amazon.co.jp/dp/4814401612)』を読み、そのデータセットを覗いて、そのデータ量の膨大さにいったん挫折したのだが、それを Gemini さんに愚痴ったところ、Gemma 使えばいいじゃね？…と言われたのが、今回のプロジェクトの発端となった。
 
 
 ## Author
