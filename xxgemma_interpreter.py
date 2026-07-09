@@ -61,17 +61,23 @@ else:
 # ==========================================
 # 2. ロボットシミュレータ (robot1 のハードコーディング)
 # ==========================================
+ROBOT1_MODE = "normal"
+#ROBOT1_MODE = "recoverable"
+#ROBOT1_MODE = "fatal"
+#ROBOT1_MODE = "battery"
+
 class DummyRobot1:
     """DSL内で import robot1 した際に利用可能になる関数群"""
-    def __init__(self):
+    def __init__(self, mode="normal"):
         self.scan_count = 0
+        self.mode = mode
 
     def robot1_scan(self) -> str:
         self.scan_count += 1
         return f"robot1_tensor_scan_data_{self.scan_count:03d}"
 
     def robot1_is_normal(self, tensor_data: str) -> bool:
-        return "scan_data" in str(tensor_data)
+        return self.mode == "normal"
 
     def robot1_model(self, tensor_data: str) -> str:
         return f"robot1_tensor_processed_model_for_{tensor_data}"
@@ -81,16 +87,39 @@ class DummyRobot1:
         return "success"
 
     def robot1_normal_act(self) -> str:
-        raise ValueError("Robot lost balance.")
+        if self.mode == "normal":
+            return "success"
+
+        elif self.mode == "recoverable":
+            raise ValueError("Robot lost balance.")
+
+        elif self.mode == "fatal":
+            raise RuntimeError("Motor controller failure.")
+
+        else:
+            raise RuntimeError(f"Unknown robot mode: {self.mode}")
 
     def robot1_error_router_determine(self) -> str:
-        return "walking"
+        if self.mode == "recoverable":
+            return "walking"
+
+        elif self.mode == "battery":
+            return "maintenance_dock"
+
+        elif self.mode == "fatal":
+            return "unhandlable"
+
+        else:
+            return "normal"
 
     def robot1_error_router_reinforce(self, loss) -> None:
         return None
 
     def robot1_walk_error_recovery(self) -> str:
         return "robot1_tensor_walk_recovery_completed"
+
+    def robot1_battery_error_recovery(self):
+        return "robot1_tensor_battery_recovery_completed"
 
     def robot1_unhandlable_error(self) -> str:
         return "robot1_unhandlable_error_detected"
@@ -241,7 +270,7 @@ class xxGemmaInterpreter:
         self.imported_modules: Set[str] = set()
         self.returned_value: Any = None
         self.exception: Optional[str] = None
-        self.robot = DummyRobot1()
+        self.robot = DummyRobot1(mode=ROBOT1_MODE)
         self.last_line_type: Optional[str] = None # 'statement', 'code', 'comment', 'result', 'exception'
 
     def clean_var_name(self, name: str) -> str:
@@ -424,6 +453,7 @@ class xxGemmaInterpreter:
                     "robot1_error_router_determine": self.robot.robot1_error_router_determine,
                     "robot1_error_router_reinforce": self.robot.robot1_error_router_reinforce,
                     "robot1_walk_error_recovery": self.robot.robot1_walk_error_recovery,
+                    "robot1_battery_error_recovery": self.robot.robot1_battery_error_recovery,
                     "robot1_unhandlable_error": self.robot.robot1_unhandlable_error,
                 })
 
@@ -589,7 +619,7 @@ class xxGemmaInterpreter:
 
     def _execute_amend(self, amend_str: str) -> Optional[str]:
         if "->" not in amend_str:
-            return None
+            raise SyntaxError("Invalid amend syntax.")
         before_part, after_part = amend_str.split("->", 1)
         after_str = after_part.strip()
         before_part = before_part.strip()
@@ -598,22 +628,30 @@ class xxGemmaInterpreter:
             target_part, search_part = before_part.split(":", 1)
             target = target_part.strip()
             search_str = search_part.strip()
-
             search_str_resolved = str(self.evaluate_expr(search_str))
             after_str_resolved = str(self.evaluate_expr(after_str))
+            if search_str_resolved == "":
+                raise ValueError("amend target cannot be empty.")
 
             if target == "$STATEMENT":
                 current_statement = self.get_statement()
+                if search_str_resolved not in current_statement:
+                    raise ValueError(f"amend target not found: {search_str_resolved}")
                 new_statement = current_statement.replace(search_str_resolved, after_str_resolved)
-                
                 # statement_parts を一度フラットにして置き換え
                 self.statement_parts = [(new_statement, False)]
             else:
                 var_name = self.clean_var_name(target)
                 if var_name in self.variables:
                     orig_val = str(self.variables[var_name])
+                    if search_str_resolved not in orig_val:
+                        raise ValueError(f"amend target not found: {search_str_resolved}")
                     new_val = orig_val.replace(search_str_resolved, after_str_resolved)
-                    if isinstance(self.variables[var_name], int):
+                    if isinstance(self.variables[var_name], bool):
+                        self.variables[var_name] = (
+                            new_val.lower() in ("true", "1", "yes")
+                        )
+                    elif isinstance(self.variables[var_name], int):
                         try: self.variables[var_name] = int(new_val)
                         except: self.variables[var_name] = new_val
                     elif isinstance(self.variables[var_name], float):
@@ -621,12 +659,18 @@ class xxGemmaInterpreter:
                         except: self.variables[var_name] = new_val
                     else:
                         self.variables[var_name] = new_val
+                else:
+                    raise NameError(f"Variable '{var_name}' is not defined.")
         else:
             search_str_resolved = str(self.evaluate_expr(before_part))
             after_str_resolved = str(self.evaluate_expr(after_str))
-            
+            if search_str_resolved == "":
+                raise ValueError("amend target cannot be empty.")
             current_statement = self.get_statement()
+            if search_str_resolved not in current_statement:
+                raise ValueError(f"amend target not found: {search_str_resolved}")
             new_statement = current_statement.replace(search_str_resolved, after_str_resolved)
+
             self.statement_parts = [(new_statement, False)]
 
         return None
@@ -722,6 +766,7 @@ class xxGemmaInterpreter:
             # 2. 変数およびドットチェーンの置換解決 ($var.key1.key2)
             content_str = re.sub(r'\$([a-zA-Z0-9_]+)((?:\.[a-zA-Z0-9_]+)*)', self._replace_var_in_text, content_str)
             content_str = content_str.replace("__L_PAREN__", "(").replace("__R_PAREN__", ")")
+            content_str = re.sub(r'\\([\\(){}\[\]$#!?.,:;+\-*="\'])', r'\1', content_str)
             content_str = content_str.strip()
             
             if not content_str:
