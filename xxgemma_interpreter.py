@@ -77,13 +77,14 @@ class DummyRobot1:
         return f"robot1_tensor_scan_data_{self.scan_count:03d}"
 
     def robot1_is_normal(self, tensor_data: str) -> bool:
-        return self.mode == "normal"
+        return True #self.mode == "normal"
 
     def robot1_model(self, tensor_data: str) -> str:
         return f"robot1_tensor_processed_model_for_{tensor_data}"
 
     def robot1_act(self, tensor_model: str) -> str:
         print(f"🤖 [ROBOT ACTION] {tensor_model} に基づいてロボットが作動しました。")
+        self.robot1_normal_act()
         return "success"
 
     def robot1_normal_act(self) -> str:
@@ -270,6 +271,7 @@ class xxGemmaInterpreter:
         self.imported_modules: Set[str] = set()
         self.returned_value: Any = None
         self.exception: Optional[str] = None
+        self.last_feedback_type: Optional[str] = None
         self.robot = DummyRobot1(mode=ROBOT1_MODE)
         self.last_line_type: Optional[str] = None # 'statement', 'code', 'comment', 'result', 'exception'
 
@@ -999,12 +1001,32 @@ def do_gemma_4_line_by_line_inference(
             # --------------------------------------------------
             # ★ AIが自分で [RESULT] などのシステムタグを出力してしまった場合のガード
             # --------------------------------------------------
-            if clean_line.startswith("[RESULT]") or clean_line.startswith("[EXCEPTION]"):
-                print(f"⚠️ [SYSTEM GUARD]: AIがシステムタグをエコーバック（自己偽造）したため、実行対象外としてスキップします: {clean_line}")
+            if clean_line.startswith("[RESULT]"):
+                print(f"⚠️ [SYSTEM GUARD]: AIがRESULTを自己生成したため無視します: {clean_line}")
+                continue
+            if clean_line.startswith("[EXCEPTION]"):
+
+                if interpreter.last_feedback_type == "EXCEPTION":
+                    print(
+                        f"⚠️ [SYSTEM GUARD]: EXCEPTIONのエコーバックを検出したため無視します: {clean_line}"
+                    )
+
+                    continue
+                print(f"⚠️ [SYSTEM GUARD]: AIが勝手にEXCEPTIONを生成しました: {clean_line}")
+                feedback_result = "[RESULT]SYSTEM_EXCEPTION_ALREADY_HANDLED"
+                print(f"      [SYSTEM FEEDBACK TO LLM]: {feedback_result}")
+                interpreter.last_feedback_type = "RESULT"
+                generated_lines.append(feedback_result)
+                messages[model_msg_idx]["content"].append({
+                    "type": "text",
+                    "text": feedback_result + "\n"
+                })
                 continue
 
-            generated_lines.append(clean_line)
+            interpreter.last_feedback_type = None
             
+            generated_lines.append(clean_line)
+
             messages[model_msg_idx]["content"].append({
                 "type": "text",
                 "text": clean_line + "\n"
@@ -1017,7 +1039,14 @@ def do_gemma_4_line_by_line_inference(
             if feedback_result:
                 print(f"    ↳ ★インタプリタによる結果を検出: {feedback_result}")
                 print(f"      [SYSTEM FEEDBACK TO LLM]: {feedback_result}")
-                
+
+                if feedback_result.startswith("[RESULT]"):
+                    interpreter.last_feedback_type = "RESULT"
+                elif feedback_result.startswith("[EXCEPTION]"):
+                    interpreter.last_feedback_type = "EXCEPTION"
+                else:
+                    interpreter.last_feedback_type = None
+
                 generated_lines.append(feedback_result)
                 
                 messages[model_msg_idx]["content"].append({
