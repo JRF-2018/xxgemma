@@ -66,6 +66,9 @@ ROBOT1_MODE = "normal"
 #ROBOT1_MODE = "fatal"
 #ROBOT1_MODE = "battery"
 
+class Robot1Exception(RuntimeError):
+    pass
+
 class DummyRobot1:
     """DSL内で import robot1 した際に利用可能になる関数群"""
     def __init__(self, mode="normal"):
@@ -92,13 +95,13 @@ class DummyRobot1:
             return "success"
 
         elif self.mode == "recoverable":
-            raise ValueError("Robot lost balance.")
+            raise Robot1Exception("Robot lost balance.")
 
         elif self.mode == "fatal":
-            raise RuntimeError("Motor controller failure.")
+            raise Robot1Exception("Motor controller failure.")
 
         else:
-            raise RuntimeError(f"Unknown robot mode: {self.mode}")
+            raise Robot1Exception(f"Unknown robot mode: {self.mode}")
 
     def robot1_error_router_determine(self) -> str:
         if self.mode == "recoverable":
@@ -540,7 +543,7 @@ class xxGemmaInterpreter:
             except InterpreterAbort:
                 raise
             except Exception as e:
-                err_msg = self.escape_feedback(str(e))
+                err_msg = self.escape_feedback(f"{type(e).__name__}: {str(e)}")
                 self.exception = err_msg
                 return f"[EXCEPTION]{err_msg}"
 
