@@ -1,5 +1,5 @@
 // xxgemma_sft_dataset.jsonc
-// Version 0.0.1 (Time-stamp: <2026-07-10T09:26:34Z>)
+// Version 0.0.1 (Time-stamp: <2026-07-10T11:31:09Z>)
 //
 // xxLLM (JSON を出力する xLLM に対し、JSON を出力するプログラムを出力
 // する LLM) を Gemma のファインチューニングで実装する。そのプロジェク
@@ -253,7 +253,7 @@
   // BASE-06: 複数の変数の結合（文字列結合）
   {
     "instruction": "Store a first name and a last name separately, then generate a sentence containing the full name.",
-    "dsl_program": "[CODE]$first_name = str \"John\"\n[CODE]$last_name = str \"Doe\"\nMy name is $first_name $last_name.\n[CODE]show $first_name\n[RESULT]\"John\"",
+    "dsl_program": "[CODE]$first_name = str \"John\"\n[CODE]$last_name = str \"Doe\"\nMy name is $first_name $last_name.\n[CODE]show $first_name\n[RESULT]John",
     "output_json": {
       "__STATEMENT__": "My name is John Doe.",
       "first_name": "John",
@@ -271,7 +271,7 @@
   },
   {
     "instruction": "Store a first name, middle name, and last name, then introduce the person using the complete name.",
-    "dsl_program": "[CODE]$first_name = str \"John\"\n[CODE]$middle_name = str \"Fitzgerald\"\n[CODE]$last_name = str \"Kennedy\"\n[CODE]show $middle_name\n[RESULT]\"Fitzgerald\"\nThe full name is $first_name $RESULT $last_name.",
+    "dsl_program": "[CODE]$first_name = str \"John\"\n[CODE]$middle_name = str \"Fitzgerald\"\n[CODE]$last_name = str \"Kennedy\"\n[CODE]show $middle_name\n[RESULT]Fitzgerald\nThe full name is $first_name $RESULT $last_name.",
     "output_json": {
       "__STATEMENT__": "The full name is John Fitzgerald Kennedy.",
       "first_name": "John",
@@ -290,7 +290,7 @@
   },
   {
     "instruction": "Store a user ID prefix and a numeric identifier as strings, then generate a user account name.",
-    "dsl_program": "[CODE]$prefix = str \"User\"\n[CODE]$id = str \"1024\"\n[CODE]show $id\n[RESULT]\"1024\"\nThe account name is $prefix$RESULT.",
+    "dsl_program": "[CODE]$prefix = str \"User\"\n[CODE]$id = str \"1024\"\n[CODE]show $id\n[RESULT]1024\nThe account name is $prefix$RESULT.",
     "output_json": {
       "__STATEMENT__": "The account name is User1024.",
       "prefix": "User",
@@ -1762,7 +1762,7 @@
     }
   },
 
-  // APP-16: 多重にネストされた変数の参照と評価
+  // APP-16: 多重にネストされた変数の参照と評価 (Experimental)
   {
     "instruction": "Access a dictionary value through a dynamically selected key. Store the key name in a variable, retrieve the corresponding value using dynamic field access, verify it with show, and generate a summary sentence.",
     "dsl_program": "[CODE]$person = dict name:str \"Alice\", age:int 30, city:str \"Osaka\"\n[CODE]$key = str \"name\"\n[CODE]show $person.($key)\n[RESULT]Alice\nThe selected value is $person.($key).",
@@ -1835,7 +1835,7 @@
   // ROB-01: 平地での定常歩行と自己位置推定
   {
     "instruction": "Move the robot forward by 5.0 meters on a flat floor and report the final pose.\n\nAvailable modules:\n- import tensor\n  Enables the tensor type.\n- import robot1\n  Loads the robot control library.\n\nAvailable functions:\n- robot1_get_pose() -> tensor\n  Returns the current robot pose.\n- robot1_walk_forward(distance: float) -> None\n  Walks forward by the specified distance.\n- robot1_get_final_pose() -> tensor\n  Returns the final pose after the motion.\n- robot1_pose_summary(pose: tensor) -> str\n  Returns a human-readable summary of a pose.\n- robot1_is_stable() -> bool\n  Returns whether the robot is standing stably.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$start_pose = tensor robot1_get_pose()\n[CODE]robot1_walk_forward(5.0)\n[RESULT]None\n[CODE]$final_pose = tensor robot1_get_final_pose()\n[CODE]show robot1_pose_summary($final_pose)\n[RESULT]\"Position=(5.00, 0.00), Heading=0 deg\"\n[CODE]show robot1_is_stable()\n[RESULT]true\nThe robot successfully walked forward for 5.0 meters.\n[CODE]return $final_pose",
+    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$start_pose = tensor robot1_get_pose()\n[CODE]robot1_walk_forward(5.0)\n[RESULT]None\n[CODE]$final_pose = tensor robot1_get_final_pose()\n[CODE]show robot1_pose_summary($final_pose)\n[RESULT]Position=(5.00, 0.00), Heading=0 deg\n[CODE]show robot1_is_stable()\n[RESULT]true\nThe robot successfully walked forward for 5.0 meters.\n[CODE]return $final_pose",
     "output_json": {
       "__STATEMENT__": "The robot successfully walked forward for 5.0 meters.",
       "__RETURN__": {
@@ -1861,7 +1861,7 @@
   },
   {
     "instruction": "Rotate the robot 90 degrees to the right, then walk forward for 2.0 meters and report the final pose.\n\nAvailable modules:\n- import tensor\n  Enables the tensor type.\n- import robot1\n  Loads the robot control library.\n\nAvailable functions:\n- robot1_get_pose() -> tensor\n  Returns the current robot pose.\n- robot1_turn_right(angle: float) -> None\n  Rotates the robot clockwise by the specified angle.\n- robot1_walk_forward(distance: float) -> None\n  Walks forward by the specified distance.\n- robot1_get_final_pose() -> tensor\n  Returns the final pose after the motion.\n- robot1_pose_summary(pose: tensor) -> str\n  Returns a human-readable summary of a pose.\n- robot1_is_stable() -> bool\n  Returns whether the robot is standing stably.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$start_pose = tensor robot1_get_pose()\n[CODE]robot1_turn_right(90.0)\n[RESULT]None\n[CODE]robot1_walk_forward(2.0)\n[RESULT]None\n[CODE]$final_pose = tensor robot1_get_final_pose()\n[CODE]show robot1_pose_summary($final_pose)\n[RESULT]\"Position=(0.00, -2.00), Heading=90 deg\"\n[CODE]show robot1_is_stable()\n[RESULT]true\nThe robot completed the right-turn walking pattern.\n[CODE]return $final_pose",
+    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$start_pose = tensor robot1_get_pose()\n[CODE]robot1_turn_right(90.0)\n[RESULT]None\n[CODE]robot1_walk_forward(2.0)\n[RESULT]None\n[CODE]$final_pose = tensor robot1_get_final_pose()\n[CODE]show robot1_pose_summary($final_pose)\n[RESULT]Position=(0.00, -2.00), Heading=90 deg\n[CODE]show robot1_is_stable()\n[RESULT]true\nThe robot completed the right-turn walking pattern.\n[CODE]return $final_pose",
     "output_json": {
       "__STATEMENT__": "The robot completed the right-turn walking pattern.",
       "__RETURN__": {
@@ -1887,7 +1887,7 @@
   },
   {
     "instruction": "指定された速度ベクトルに従ってロボットを定常走行させ、最終状態を報告してください。\n\n利用可能モジュール:\n- import tensor\n  tensor 型を有効にします。\n- import robot1\n  ロボット制御ライブラリを読み込みます。\n\n利用可能関数:\n- robot1_get_target_velocity() -> tensor\n  目標速度ベクトルを返します。\n- robot1_follow_velocity(velocity: tensor) -> None\n  指定された速度ベクトルに従って走行します。\n- robot1_get_final_pose() -> tensor\n  走行終了後の姿勢を返します。\n- robot1_pose_summary(pose: tensor) -> str\n  姿勢を人が読みやすい文字列に変換します。\n- robot1_is_stable() -> bool\n  ロボットが安定状態にあるかを返します。",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$velocity = tensor robot1_get_target_velocity()\n[CODE]robot1_follow_velocity($velocity)\n[RESULT]None\n[CODE]$final_pose = tensor robot1_get_final_pose()\n[CODE]show robot1_pose_summary($final_pose)\n[RESULT]\"Velocity tracking completed. Position=(8.20, 1.50)\"\n[CODE]show robot1_is_stable()\n[RESULT]true\nロボットは指定された速度ベクトルに従って正常に走行しました。\n[CODE]return $final_pose",
+    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$velocity = tensor robot1_get_target_velocity()\n[CODE]robot1_follow_velocity($velocity)\n[RESULT]None\n[CODE]$final_pose = tensor robot1_get_final_pose()\n[CODE]show robot1_pose_summary($final_pose)\n[RESULT]Velocity tracking completed. Position=(8.20, 1.50)\n[CODE]show robot1_is_stable()\n[RESULT]true\nロボットは指定された速度ベクトルに従って正常に走行しました。\n[CODE]return $final_pose",
     "output_json": {
       "__STATEMENT__": "ロボットは指定された速度ベクトルに従って正常に走行しました。",
       "__RETURN__": {
@@ -2921,422 +2921,297 @@
 
   // PHYS-01: ロボットのつまずき（Stumbled）と歩行リカバリ
   {
-    "instruction": "A humanoid robot stumbled over a small stone while walking on a flat floor. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_normal_act() -> tensor (starts the walking motion), robot1_error_router_determine() -> str (returns the recovery policy), robot1_walk_error_recovery() -> tensor (generates a recovery motion), robot1_error_router_reinforce(tensor) -> None (updates the router using a recovery loss tensor), robot1_unhandlable_error() -> str (reports an unrecoverable fault). Recover the robot safely without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$motion = tensor robot1_normal_act()\n[EXCEPTION]Robot lost balance.\n[COMMENT]A small stumble on a flat floor should use the walking recovery policy.\n[CODE]show robot1_error_router_determine()\n[RESULT]walking\n[CODE]$recovery = tensor robot1_walk_error_recovery()\nThe robot recovered from a small stumble on the flat floor.\n[CODE]return \"Recovered\"",
+    "instruction": "A humanoid robot stumbled while walking over loose gravel. Use the following libraries.\n\nimport tensor\n  - tensor <expr>: convert data to tensor.\n\nimport humanoid_a\n  - capture_posture() -> tensor : Acquire current body posture.\n  - walk_forward(distance: float) -> None : Walk forward.\n  - estimate_instability() -> str : Estimate the dominant instability.\n  - recover_balance(mode: str) -> None : Execute a balance recovery behavior.\n  - resume_walk() -> None : Resume walking after recovery.\n\nIf a recoverable physical error occurs, analyze the situation and recover safely.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import humanoid_a\n[CODE]$pose = tensor capture_posture()\n[CODE]walk_forward(4.0)\n[EXCEPTION]BalanceException: Foot slipped on loose gravel.\n[COMMENT]Select an appropriate recovery according to the instability estimate.\n[CODE]show estimate_instability()\n[RESULT]\"forward\"\n[CODE]recover_balance(\"forward\")\n[CODE]resume_walk()",
     "output_json": {
-      "motion": {
+      "pose": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot recovered from a small stumble on the flat floor.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": "",
+      "recovery_mode": "forward"
     }
   },
   {
-    "instruction": "A humanoid robot stumbled while climbing stairs. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_normal_act() -> tensor, robot1_error_router_determine() -> str, robot1_walk_error_recovery() -> tensor, robot1_error_router_reinforce(tensor) -> None, robot1_unhandlable_error() -> str. After recovering, obtain a recovery loss tensor and reinforce the router.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$motion = tensor robot1_normal_act()\n[EXCEPTION]Robot lost balance.\n[COMMENT]A stair stumble requires dynamic balance recovery followed by router reinforcement.\n[CODE]show robot1_error_router_determine()\n[RESULT]walking\n[CODE]$loss = tensor robot1_walk_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot regained balance while climbing the stairs.\n[CODE]return \"Recovered\"",
+    "instruction": "A warehouse transport robot lost balance while climbing a loading ramp.\n\nimport tensor\n  - tensor <expr>: convert data to tensor.\n\nimport warehouse_bot\n  - read_motion_state() -> tensor : Read motion state.\n  - climb_ramp() -> None : Climb the ramp.\n  - classify_fault() -> str : Classify the detected physical fault.\n  - stabilize_chassis(profile: str) -> tensor : Recover chassis stability.\n  - adapt_policy(loss: tensor) -> None : Update recovery policy.\n\nIf recovery succeeds, continue operation.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import warehouse_bot\n[CODE]$state = tensor read_motion_state()\n[CODE]climb_ramp()\n[EXCEPTION]BalanceException: Rear wheel lost traction during ascent.\n[COMMENT]Choose the stabilization profile before adaptation.\n[CODE]show classify_fault()\n[RESULT]\"rear_slip\"\n[CODE]$loss = tensor stabilize_chassis(\"rear_slip\")\n[CODE]adapt_policy($loss)",
     "output_json": {
-      "motion": {
-        "__type__": "tensor",
-        "__value__": null
+      "state": {
+	"__type__": "tensor",
+	"__value__": null
       },
       "loss": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "__STATEMENT__": "The robot regained balance while climbing the stairs.",
-      "__RETURN__": "Recovered"
-    }
-  },
-  {
-    "instruction": "歩行中にロボットがカーペットの端につまずきました。xxGemma DSL を使用してください。最初に tensor と robot1 を import してください。利用可能な関数: robot1_normal_act() -> tensor (歩行開始)、robot1_error_router_determine() -> str (回復方策の決定)、robot1_walk_error_recovery() -> tensor (回復動作生成)、robot1_error_router_reinforce(tensor) -> None (ルーター学習)、robot1_unhandlable_error() -> str (回復不能エラー)。今回は強化学習は行わず安全に回復してください。",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$motion = tensor robot1_normal_act()\n[EXCEPTION]Robot lost balance.\n[COMMENT]The carpet edge can be handled by a simple walking recovery.\n[CODE]show robot1_error_router_determine()\n[RESULT]walking\n[CODE]$recovery = tensor robot1_walk_error_recovery()\nロボットはカーペットの端から安全に立ち直った。\n[CODE]return \"Recovered\"",
-    "output_json": {
-      "motion": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "ロボットはカーペットの端から安全に立ち直った。",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A delivery robot carrying a heavy package stumbled forward because the load shifted. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_normal_act() -> tensor (starts locomotion), robot1_error_router_determine() -> str (selects a recovery policy), robot1_walk_error_recovery() -> tensor (returns a recovery tensor), robot1_error_router_reinforce(tensor) -> None (updates the routing policy using a loss tensor), robot1_unhandlable_error() -> str (reports a fatal fault). Recover the robot and reinforce the router using the center-of-mass error tensor.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$motion = tensor robot1_normal_act()\n[EXCEPTION]Robot lost balance.\n[COMMENT]A forward stumble while carrying a heavy load requires dynamic recovery and router adaptation.\n[CODE]show robot1_error_router_determine()\n[RESULT]walking\n[CODE]$loss = tensor robot1_walk_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot restored its balance while protecting the carried package.\n[CODE]return \"Recovered\"",
+    "instruction": "歩行中のサービスロボットがカーペットの端に足を引っ掛けました。\n\nimport tensor\n  - tensor <expr>: テンソルへ変換します。\n\nimport service_robot\n  - sense_gait() -> tensor : 歩容状態を取得\n  - patrol() -> None : 巡回歩行\n  - diagnose_step() -> str : 異常な足運びを診断\n  - perform_side_step(direction: str) -> None : 横ステップで回復\n  - continue_patrol() -> None : 巡回を再開\n\n異常を分析し、安全に回復してください。",
+    "dsl_program": "[CODE]import tensor\n[CODE]import service_robot\n[CODE]$gait = tensor sense_gait()\n[CODE]patrol()\n[EXCEPTION]BalanceException: Foot caught on carpet edge.\n[COMMENT]Use a lateral recovery step when appropriate.\n[CODE]show diagnose_step()\n[RESULT]\"left\"\n[CODE]perform_side_step(\"left\")\n[CODE]continue_patrol()",
     "output_json": {
-      "motion": {
-        "__type__": "tensor",
-        "__value__": null
+      "gait": {
+	"__type__": "tensor",
+	"__value__": null
+      },
+      "__STATEMENT__": "",
+      "direction": "left"
+    }
+  },
+  {
+    "instruction": "A delivery robot carrying a package leaned forward after hitting a floor gap.\n\nimport tensor\n  - tensor <expr>: convert data to tensor.\n\nimport courier_bot\n  - payload_state() -> tensor : Read payload dynamics.\n  - deliver_package() -> None : Continue delivery.\n  - analyze_payload_shift() -> str : Analyze load movement.\n  - compensate_center_of_mass(mode: str) -> tensor : Recover balance.\n  - update_controller(loss: tensor) -> None : Improve the controller.\n\nRecover while protecting the payload.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import courier_bot\n[CODE]$payload = tensor payload_state()\n[CODE]deliver_package()\n[EXCEPTION]PayloadException: Forward load shift detected.\n[COMMENT]Select the center-of-mass compensation strategy.\n[CODE]show analyze_payload_shift()\n[RESULT]\"front_heavy\"\n[CODE]$loss = tensor compensate_center_of_mass(\"front_heavy\")\n[CODE]update_controller($loss)",
+    "output_json": {
+      "payload": {
+	"__type__": "tensor",
+	"__value__": null
       },
       "loss": {
-        "__type__": "tensor",
-        "__value__": null
+	"__type__": "tensor",
+	"__value__": null
       },
-      "__STATEMENT__": "The robot restored its balance while protecting the carried package.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A humanoid robot unexpectedly touched the edge of a step in a dark environment. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_normal_act() -> tensor (starts walking), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_walk_error_recovery() -> tensor (creates a recovery motion), robot1_error_router_reinforce(tensor) -> None (router learning), robot1_unhandlable_error() -> str (fatal error report). Recover safely without reinforcement by slowing down and regaining stability.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$motion = tensor robot1_normal_act()\n[EXCEPTION]Robot lost balance.\n[COMMENT]A hidden step in a dark area should trigger a cautious walking recovery without reinforcement.\n[CODE]show robot1_error_router_determine()\n[RESULT]walking\n[CODE]$recovery = tensor robot1_walk_error_recovery()\nThe robot slowed down and safely recovered after touching the hidden step.\n[CODE]return \"Recovered\"",
+    "instruction": "A night patrol robot encountered an unexpected curb in a dark environment.\n\nimport tensor\n  - tensor <expr>: convert data to tensor.\n\nimport patrol_unit\n  - observe_motion() -> tensor : Observe current motion.\n  - advance() -> None : Move forward.\n  - inspect_incident() -> str : Inspect the cause of instability.\n  - execute_safe_stop() -> None : Stop safely.\n  - regain_posture() -> None : Restore a stable standing posture.\n  - continue_route() -> None : Resume the patrol route.\n\nRecover safely without unnecessary learning updates.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import patrol_unit\n[CODE]$motion = tensor observe_motion()\n[CODE]advance()\n[EXCEPTION]NavigationException: Unexpected curb contact detected.\n[COMMENT]Perform a conservative recovery when visibility is limited.\n[CODE]show inspect_incident()\n[RESULT]\"low_visibility\"\n[CODE]execute_safe_stop()\n[CODE]regain_posture()\n[CODE]continue_route()",
     "output_json": {
       "motion": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot slowed down and safely recovered after touching the hidden step.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": "",
+      "incident": "low_visibility"
     }
   },
 
   // PHYS-02: 物体の把持失敗（Grasp Failed）と再アプローチ
   {
-    "instruction": "A robot failed to grasp a slippery plastic bottle. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures sensor data), robot1_is_normal(tensor) -> bool (checks whether the scan is valid), robot1_model(tensor) -> tensor (generates a grasp model), robot1_act(tensor) -> str (executes the grasp), robot1_error_router_determine() -> str (selects a recovery strategy), robot1_grasp_error_recovery() -> tensor (generates a new grasp motion), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Recover by switching to a torque-oriented grasp policy without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scan = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($scan)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Grasp failed.\n[COMMENT]A slippery bottle should switch to the torque recovery policy.\n[CODE]show robot1_error_router_determine()\n[RESULT]torque\n[CODE]$recovery = tensor robot1_grasp_error_recovery()\nThe robot successfully grasped the slippery bottle after changing the grasp policy.\n[CODE]return \"Recovered\"",
+    "instruction": "A robotic manipulator failed to grasp a slippery plastic bottle.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport manipulator_x\n  - capture_grasp_state() -> tensor : Acquire the current grasp state.\n  - grasp_object() -> None : Attempt to grasp the target.\n  - inspect_contact() -> str : Analyze the cause of the failed grasp.\n  - retry_grasp(mode: str) -> None : Retry using an alternative grasp strategy.\n  - continue_task() -> None : Resume the interrupted task.\n\nIf grasping fails, analyze the failure and recover safely.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import manipulator_x\n[CODE]$grasp = tensor capture_grasp_state()\n[CODE]grasp_object()\n[EXCEPTION]GraspException: Object slipped during contact.\n[COMMENT]Select a grasp strategy appropriate for the detected contact condition.\n[CODE]show inspect_contact()\n[RESULT]\"low_friction\"\n[CODE]retry_grasp(\"low_friction\")\n[CODE]continue_task()",
     "output_json": {
-      "scan": {
-        "__type__": "tensor",
-        "__value__": null
+      "grasp": {
+	"__type__": "tensor",
+	"__value__": null
       },
-      "plan": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "recovery": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "__STATEMENT__": "The robot successfully grasped the slippery bottle after changing the grasp policy.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": "",
+      "contact": "low_friction"
     }
   },
   {
-    "instruction": "A robot detected deformation while trying to grasp a paper cup. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor, robot1_is_normal(tensor) -> bool, robot1_model(tensor) -> tensor, robot1_act(tensor) -> str, robot1_error_router_determine() -> str, robot1_grasp_error_recovery() -> tensor, robot1_error_router_reinforce(tensor) -> None, robot1_unhandlable_error() -> str. Recover the grasp and reinforce the router using the elastic deformation loss tensor.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scan = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($scan)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Grasp failed.\n[COMMENT]A deformable paper cup requires compliant grasp recovery with router adaptation.\n[CODE]show robot1_error_router_determine()\n[RESULT]compliance\n[CODE]$loss = tensor robot1_grasp_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot adjusted its grasp and safely picked up the paper cup.\n[CODE]return \"Recovered\"",
+    "instruction": "A laboratory robot deformed a paper cup while attempting to pick it up.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport lab_assistant\n  - read_gripper_state() -> tensor : Read the current gripper state.\n  - pick_sample() -> None : Pick up the sample.\n  - estimate_material() -> str : Estimate the material response.\n  - adjust_grip(profile: str) -> tensor : Execute an adaptive grasp.\n  - refine_gripper(loss: tensor) -> None : Update the grasp controller.\n\nRecover the grasp while minimizing deformation.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import lab_assistant\n[CODE]$gripper = tensor read_gripper_state()\n[CODE]pick_sample()\n[EXCEPTION]ManipulatorException: Excessive deformation detected.\n[COMMENT]Choose a compliant gripping profile before adaptation.\n[CODE]show estimate_material()\n[RESULT]\"soft_surface\"\n[CODE]$loss = tensor adjust_grip(\"soft_surface\")\n[CODE]refine_gripper($loss)",
     "output_json": {
-      "scan": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "plan": {
-        "__type__": "tensor",
-        "__value__": null
+      "gripper": {
+	"__type__": "tensor",
+	"__value__": null
       },
       "loss": {
-        "__type__": "tensor",
-        "__value__": null
+	"__type__": "tensor",
+	"__value__": null
       },
-      "__STATEMENT__": "The robot adjusted its grasp and safely picked up the paper cup.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "ロボットが対象物の位置ずれにより空振りしました。xxGemma DSL を使用してください。最初に tensor と robot1 を import してください。利用可能な関数: robot1_scan() -> tensor (センサースキャン), robot1_is_normal(tensor) -> bool (スキャン確認), robot1_model(tensor) -> tensor (把持モデル生成), robot1_act(tensor) -> str (把持実行), robot1_error_router_determine() -> str (回復方策決定), robot1_grasp_error_recovery() -> tensor (再アプローチ動作生成), robot1_error_router_reinforce(tensor) -> None (ルーター更新), robot1_unhandlable_error() -> str (回復不能エラー)。今回は再スキャンによる回復のみを行ってください。",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scan = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($scan)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Grasp failed.\n[COMMENT]Restart the vision-based grasp planning without reinforcement.\n[CODE]show robot1_error_router_determine()\n[RESULT]vision\n[CODE]$recovery = tensor robot1_grasp_error_recovery()\nロボットは再スキャン後に対象物の把持に成功した。\n[CODE]return \"Recovered\"",
+    "instruction": "棚の商品を把持しようとしたところ、位置ずれにより空振りしました。\n\nimport tensor\n  - tensor <expr>: テンソルへ変換します。\n\nimport shelf_picker\n  - scan_workspace() -> tensor : 作業空間を取得\n  - pick_item() -> None : 商品を把持\n  - evaluate_alignment() -> str : 位置ずれを評価\n  - rescan_target() -> None : 対象を再スキャン\n  - retry_pick(offset: str) -> None : 補正後に再把持\n\n把持失敗時は原因を分析して適切に回復してください。",
+    "dsl_program": "[CODE]import tensor\n[CODE]import shelf_picker\n[CODE]$scene = tensor scan_workspace()\n[CODE]pick_item()\n[EXCEPTION]ManipulatorException: Target position mismatch detected.\n[COMMENT]Perform a new scan before retrying the grasp.\n[CODE]show evaluate_alignment()\n[RESULT]\"right_offset\"\n[CODE]rescan_target()\n[CODE]retry_pick(\"right_offset\")",
     "output_json": {
-      "scan": {
-        "__type__": "tensor",
-        "__value__": null
+      "scene": {
+	"__type__": "tensor",
+	"__value__": null
       },
-      "plan": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "recovery": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "__STATEMENT__": "ロボットは再スキャン後に対象物の把持に成功した。",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": "",
+      "offset": "right_offset"
     }
   },
   {
-    "instruction": "A warehouse robot failed to hold a heavy metal component because it slipped during lifting. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures sensor data), robot1_is_normal(tensor) -> bool (checks sensor validity), robot1_model(tensor) -> tensor (builds a grasp model), robot1_act(tensor) -> str (executes the grasp), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_grasp_error_recovery() -> tensor (generates a revised grasp motion), robot1_error_router_reinforce(tensor) -> None (updates the router using a loss tensor), robot1_unhandlable_error() -> str (reports a fatal fault). Recover the grasp and reinforce the router using the slip error tensor.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scan = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($scan)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Grasp failed.\n[COMMENT]A heavy object requires slip-aware recovery and router adaptation.\n[CODE]show robot1_error_router_determine()\n[RESULT]slip_control\n[CODE]$loss = tensor robot1_grasp_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot recovered from the grasp slip and securely lifted the heavy component.\n[CODE]return \"Recovered\"",
+    "instruction": "An industrial robot failed to hold a heavy metal component because of gradual slipping.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport assembly_arm\n  - monitor_grasp() -> tensor : Monitor grasp quality.\n  - lift_component() -> None : Lift the workpiece.\n  - measure_slip() -> str : Measure the slipping condition.\n  - increase_holding_force(level: str) -> tensor : Apply a stronger holding strategy.\n  - update_estimator(loss: tensor) -> None : Improve the slip estimator.\n\nRecover without dropping the component.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import assembly_arm\n[CODE]$monitor = tensor monitor_grasp()\n[CODE]lift_component()\n[EXCEPTION]GraspException: Progressive slipping detected.\n[COMMENT]Increase holding force according to the measured slip level.\n[CODE]show measure_slip()\n[RESULT]\"moderate\"\n[CODE]$loss = tensor increase_holding_force(\"moderate\")\n[CODE]update_estimator($loss)",
     "output_json": {
-      "scan": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "plan": {
-        "__type__": "tensor",
-        "__value__": null
+      "monitor": {
+	"__type__": "tensor",
+	"__value__": null
       },
       "loss": {
-        "__type__": "tensor",
-        "__value__": null
+	"__type__": "tensor",
+	"__value__": null
       },
-      "__STATEMENT__": "The robot recovered from the grasp slip and securely lifted the heavy component.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A robot attempted to grasp a soft stuffed toy, but the object deformed and slipped away. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures sensor data), robot1_is_normal(tensor) -> bool (checks the scan), robot1_model(tensor) -> tensor (generates a grasp plan), robot1_act(tensor) -> str (executes the motion), robot1_error_router_determine() -> str (selects a recovery policy), robot1_grasp_error_recovery() -> tensor (generates a compliant recovery motion), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal fault). Recover by switching to a soft-object grasp mode without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scan = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($scan)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Grasp failed.\n[COMMENT]A soft object should use a compliant grasp policy without reinforcement.\n[CODE]show robot1_error_router_determine()\n[RESULT]soft_grasp\n[CODE]$recovery = tensor robot1_grasp_error_recovery()\nThe robot switched to the soft grasp mode and successfully picked up the stuffed toy.\n[CODE]return \"Recovered\"",
+    "instruction": "A domestic robot attempted to pick up a soft stuffed toy, but the object compressed excessively.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport home_helper\n  - observe_gripper() -> tensor : Observe the gripper state.\n  - pick_up() -> None : Pick up the object.\n  - identify_object_response() -> str : Analyze deformation characteristics.\n  - enable_soft_grasp(mode: str) -> None : Switch to a compliant grasp mode.\n  - resume_cleanup() -> None : Resume the cleaning task.\n\nRecover using a grasp strategy suitable for deformable objects.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import home_helper\n[CODE]$state = tensor observe_gripper()\n[CODE]pick_up()\n[EXCEPTION]ManipulatorException: Excessive object deformation detected.\n[COMMENT]Select a compliant grasp mode for deformable objects.\n[CODE]show identify_object_response()\n[RESULT]\"compressible\"\n[CODE]enable_soft_grasp(\"compressible\")\n[CODE]resume_cleanup()",
     "output_json": {
-      "scan": {
-        "__type__": "tensor",
-        "__value__": null
+      "state": {
+	"__type__": "tensor",
+	"__value__": null
       },
-      "plan": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "recovery": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "__STATEMENT__": "The robot switched to the soft grasp mode and successfully picked up the stuffed toy.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": "",
+      "object_response": "compressible"
     }
   },
 
   // PHYS-03: 介護ロボットの「持ち上げ」時のバランス不整合
   {
-    "instruction": "A nursing robot lost its balance while beginning to lift a patient who suddenly moved. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures body posture data), robot1_model(tensor) -> tensor (generates a lifting motion), robot1_act(tensor) -> str (executes the lift), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_lift_error_recovery() -> tensor (generates a recovery motion), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Recover the lift and reinforce the router using the center-of-mass error tensor.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$pose = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($pose)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Lift balance lost.\n[COMMENT]A sudden patient movement requires dynamic balance recovery and router adaptation.\n[CODE]show robot1_error_router_determine()\n[RESULT]lower_body_support\n[CODE]$loss = tensor robot1_lift_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot stabilized itself and safely continued lifting the patient.\n[CODE]return \"Recovered\"",
+    "instruction": "A nursing assistant robot became unstable while lifting a patient from a bed.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport care_lifter\n  - capture_support_state() -> tensor : Capture the current support posture.\n  - lift_patient() -> None : Begin the lifting motion.\n  - evaluate_stability() -> str : Analyze the primary cause of instability.\n  - engage_leg_support(mode: str) -> tensor : Activate lower-body stabilization.\n  - optimize_posture(loss: tensor) -> None : Improve future lifting behavior.\n\nIf instability occurs, recover safely while protecting the patient.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import care_lifter\n[CODE]$support = tensor capture_support_state()\n[CODE]lift_patient()\n[EXCEPTION]BalanceException: Patient shifted unexpectedly during lifting.\n[COMMENT]Select a stabilization strategy based on the patient's movement.\n[CODE]show evaluate_stability()\n[RESULT]\"forward_shift\"\n[CODE]$loss = tensor engage_leg_support(\"forward_shift\")\n[CODE]optimize_posture($loss)",
     "output_json": {
-      "pose": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "plan": {
-        "__type__": "tensor",
-        "__value__": null
+      "support": {
+	"__type__": "tensor",
+	"__value__": null
       },
       "loss": {
-        "__type__": "tensor",
-        "__value__": null
+	"__type__": "tensor",
+	"__value__": null
       },
-      "__STATEMENT__": "The robot stabilized itself and safely continued lifting the patient.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A nursing robot found that its lifting angle did not match the wheelchair position during a transfer. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor, robot1_model(tensor) -> tensor, robot1_act(tensor) -> str, robot1_error_router_determine() -> str, robot1_lift_error_recovery() -> tensor, robot1_error_router_reinforce(tensor) -> None, robot1_unhandlable_error() -> str. Correct the arm angle without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$pose = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($pose)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Lift alignment failed.\n[COMMENT]Correct the arm trajectory and resume the transfer without reinforcement.\n[CODE]show robot1_error_router_determine()\n[RESULT]arm_assist\n[CODE]$recovery = tensor robot1_lift_error_recovery()\nThe robot corrected its lifting angle and completed the transfer safely.\n[CODE]return \"Recovered\"",
+    "instruction": "A patient transfer robot detected poor alignment with a wheelchair before lifting.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport transfer_bot\n  - inspect_transfer_pose() -> tensor : Inspect the transfer posture.\n  - begin_transfer() -> None : Start the transfer.\n  - analyze_alignment() -> str : Analyze body alignment.\n  - reposition_arms(direction: str) -> None : Correct arm placement.\n  - resume_transfer() -> None : Continue the transfer.\n\nRecover safely before lifting further.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import transfer_bot\n[CODE]$pose = tensor inspect_transfer_pose()\n[CODE]begin_transfer()\n[EXCEPTION]AlignmentException: Wheelchair angle exceeds the safe transfer range.\n[COMMENT]Correct arm positioning before continuing the transfer.\n[CODE]show analyze_alignment()\n[RESULT]\"rotate_left\"\n[CODE]reposition_arms(\"rotate_left\")\n[CODE]resume_transfer()",
     "output_json": {
       "pose": {
-        "__type__": "tensor",
-        "__value__": null
+	"__type__": "tensor",
+	"__value__": null
       },
-      "plan": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "recovery": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "__STATEMENT__": "The robot corrected its lifting angle and completed the transfer safely.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": "",
+      "alignment": "rotate_left"
     }
   },
   {
-    "instruction": "介護ロボットが想定より重い利用者を持ち上げようとして姿勢を崩しました。xxGemma DSL を使用してください。最初に tensor と robot1 を import してください。利用可能な関数: robot1_scan() -> tensor (姿勢取得)、robot1_model(tensor) -> tensor (持ち上げ動作生成)、robot1_act(tensor) -> str (持ち上げ実行)、robot1_error_router_determine() -> str (回復方策決定)、robot1_lift_error_recovery() -> tensor (回復動作生成)、robot1_error_router_reinforce(tensor) -> None (ルーター更新)、robot1_unhandlable_error() -> str (回復不能エラー)。重心補正後に誤差テンソルを用いてルーターを学習してください。",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$pose = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($pose)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Lift balance lost.\n[COMMENT]A heavier-than-expected load requires lower-body stabilization and reinforcement.\n[CODE]show robot1_error_router_determine()\n[RESULT]lower_body_support\n[CODE]$loss = tensor robot1_lift_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nロボットは姿勢を立て直し、安全に持ち上げを継続した。\n[CODE]return \"Recovered\"",
+    "instruction": "介護支援ロボットが利用者を持ち上げた際、想定以上の荷重を検知しました。\n\nimport tensor\n  - tensor <expr>: テンソルへ変換します。\n\nimport assist_robot\n  - read_load_state() -> tensor : 荷重状態を取得\n  - raise_patient() -> None : 持ち上げ動作を開始\n  - estimate_load_distribution() -> str : 荷重分布を推定\n  - redistribute_support(profile: str) -> tensor : 支持姿勢を再調整\n  - adapt_lifting_policy(loss: tensor) -> None : 制御方策を更新\n\n安全を優先して回復してください。",
+    "dsl_program": "[CODE]import tensor\n[CODE]import assist_robot\n[CODE]$load = tensor read_load_state()\n[CODE]raise_patient()\n[EXCEPTION]LoadException: Actual patient weight exceeds the planned support profile.\n[COMMENT]Redistribute the supporting force before continuing.\n[CODE]show estimate_load_distribution()\n[RESULT]\"left_bias\"\n[CODE]$loss = tensor redistribute_support(\"left_bias\")\n[CODE]adapt_lifting_policy($loss)",
     "output_json": {
-      "pose": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "plan": {
-        "__type__": "tensor",
-        "__value__": null
+      "load": {
+	"__type__": "tensor",
+	"__value__": null
       },
       "loss": {
-        "__type__": "tensor",
-        "__value__": null
+	"__type__": "tensor",
+	"__value__": null
       },
-      "__STATEMENT__": "ロボットは姿勢を立て直し、安全に持ち上げを継続した。",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A nursing robot exceeded its safe bending angle while lifting a patient from a bed. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures posture information), robot1_model(tensor) -> tensor (generates a lifting motion), robot1_act(tensor) -> str (executes the lift), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_lift_error_recovery() -> tensor (generates a safe recovery posture), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Recover by switching to a stable support posture without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$pose = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($pose)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Lift posture exceeded safe limit.\n[COMMENT]When the bending angle becomes unsafe, change to a stable support posture without reinforcement.\n[CODE]show robot1_error_router_determine()\n[RESULT]lower_body_support\n[CODE]$recovery = tensor robot1_lift_error_recovery()\nThe robot switched to a stable support posture and safely resumed the lifting task.\n[CODE]return \"Recovered\"",
+    "instruction": "A rehabilitation robot exceeded its safe bending angle while assisting a patient.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport rehab_helper\n  - monitor_body_pose() -> tensor : Monitor robot posture.\n  - assist_standing() -> None : Assist the patient to stand.\n  - inspect_joint_margin() -> str : Evaluate remaining joint margin.\n  - shift_support_pose(mode: str) -> None : Move into a safer support posture.\n  - continue_assistance() -> None : Resume patient assistance.\n\nRecover without stressing the joints further.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import rehab_helper\n[CODE]$body = tensor monitor_body_pose()\n[CODE]assist_standing()\n[EXCEPTION]JointLimitException: Safe bending angle exceeded.\n[COMMENT]Switch to a safer support posture before resuming assistance.\n[CODE]show inspect_joint_margin()\n[RESULT]\"lower_center\"\n[CODE]shift_support_pose(\"lower_center\")\n[CODE]continue_assistance()",
     "output_json": {
-      "pose": {
-        "__type__": "tensor",
-        "__value__": null
+      "body": {
+	"__type__": "tensor",
+	"__value__": null
       },
-      "plan": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "recovery": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "__STATEMENT__": "The robot switched to a stable support posture and safely resumed the lifting task.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": "",
+      "support_mode": "lower_center"
     }
   },
   {
-    "instruction": "A nursing robot detected floor slippage while lifting a patient in a wet room. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures posture and contact data), robot1_model(tensor) -> tensor (generates a lifting motion), robot1_act(tensor) -> str (executes the lift), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_lift_error_recovery() -> tensor (generates a stabilized recovery motion), robot1_error_router_reinforce(tensor) -> None (updates the router using a recovery loss tensor), robot1_unhandlable_error() -> str (reports a fatal error). Recover the robot and reinforce the router using the slip-related loss tensor.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$pose = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($pose)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Lift balance lost.\n[COMMENT]A slippery floor requires balance recovery followed by router reinforcement.\n[CODE]show robot1_error_router_determine()\n[RESULT]lower_body_support\n[CODE]$loss = tensor robot1_lift_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot compensated for the slippery floor and completed the lift safely.\n[CODE]return \"Recovered\"",
+    "instruction": "A hospital lifting robot detected floor slippage while supporting a patient.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport hospital_assist\n  - sense_floor_contact() -> tensor : Observe floor contact conditions.\n  - support_patient() -> None : Support the patient during lifting.\n  - classify_surface() -> str : Classify the current floor condition.\n  - stabilize_footing(mode: str) -> tensor : Improve footing stability.\n  - update_balance_model(loss: tensor) -> None : Update the balance model.\n\nMaintain patient safety throughout the recovery.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import hospital_assist\n[CODE]$floor = tensor sense_floor_contact()\n[CODE]support_patient()\n[EXCEPTION]SlipException: Reduced floor traction detected beneath the support leg.\n[COMMENT]Stabilize the support footing before resuming the lift.\n[CODE]show classify_surface()\n[RESULT]\"wet_floor\"\n[CODE]$loss = tensor stabilize_footing(\"wet_floor\")\n[CODE]update_balance_model($loss)",
     "output_json": {
-      "pose": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "plan": {
-        "__type__": "tensor",
-        "__value__": null
+      "floor": {
+	"__type__": "tensor",
+	"__value__": null
       },
       "loss": {
-        "__type__": "tensor",
-        "__value__": null
+	"__type__": "tensor",
+	"__value__": null
       },
-      "__STATEMENT__": "The robot compensated for the slippery floor and completed the lift safely.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
 
   // PHYS-04: センサーの遮蔽（Camera Blocked）と代替センサーへの切り替え
   {
-    "instruction": "The main camera of a mobile robot became covered with condensation during navigation. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures the current sensor data), robot1_model(tensor) -> tensor (generates a navigation model), robot1_act(tensor) -> str (executes navigation), robot1_error_router_determine() -> str (selects a recovery policy), robot1_sensor_error_recovery() -> tensor (switches to an alternative sensing strategy), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal fault). Switch to LiDAR-based navigation without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$sensor = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($sensor)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Camera blocked.\n[COMMENT]Condensation should trigger a fallback to LiDAR navigation without reinforcement.\n[CODE]show robot1_error_router_determine()\n[RESULT]lidar\n[CODE]$recovery = tensor robot1_sensor_error_recovery()\nThe robot switched to LiDAR navigation and safely continued its route.\n[CODE]return \"Recovered\"",
+    "instruction": "The primary camera of an outdoor inspection robot became obscured by condensation.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport inspection_bot\n  - capture_sensor_state() -> tensor : Acquire the current sensor status.\n  - inspect_pipeline() -> None : Begin pipeline inspection.\n  - assess_visibility() -> str : Evaluate camera visibility.\n  - switch_navigation_sensor(mode: str) -> None : Select an alternative navigation sensor.\n  - resume_inspection() -> None : Continue the inspection.\n\nIf the camera becomes unusable, analyze the situation and recover safely.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import inspection_bot\n[CODE]$sensor = tensor capture_sensor_state()\n[CODE]inspect_pipeline()\n[EXCEPTION]VisionException: Camera image obscured by condensation.\n[COMMENT]Select the most reliable sensing modality under poor visibility.\n[CODE]show assess_visibility()\n[RESULT]\"infrared\"\n[CODE]switch_navigation_sensor(\"infrared\")\n[CODE]resume_inspection()",
     "output_json": {
       "sensor": {
-        "__type__": "tensor",
-        "__value__": null
+	"__type__": "tensor",
+	"__value__": null
       },
-      "plan": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "recovery": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "__STATEMENT__": "The robot switched to LiDAR navigation and safely continued its route.",
-      "__RETURN__": "Recovered"
+      "visibility_mode": "infrared",
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A robot camera was saturated by sudden backlighting. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures sensor input), robot1_model(tensor) -> tensor (builds the perception model), robot1_act(tensor) -> str (executes navigation), robot1_error_router_determine() -> str (selects a recovery strategy), robot1_sensor_error_recovery() -> tensor (adjusts sensing parameters), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Recover by changing the camera exposure settings without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$sensor = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($sensor)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Camera blocked.\n[COMMENT]Strong backlighting should switch to the exposure adjustment policy.\n[CODE]show robot1_error_router_determine()\n[RESULT]camera\n[CODE]$recovery = tensor robot1_sensor_error_recovery()\nThe robot adjusted the camera settings and resumed navigation.\n[CODE]return \"Recovered\"",
+    "instruction": "A mobile robot encountered severe backlighting while approaching a loading dock.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport dock_runner\n  - read_camera_status() -> tensor : Read camera status.\n  - approach_dock() -> None : Navigate toward the dock.\n  - diagnose_imaging() -> str : Diagnose the imaging condition.\n  - tune_exposure(profile: str) -> None : Apply a camera exposure profile.\n  - continue_navigation() -> None : Continue navigation.\n\nRecover vision before proceeding.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import dock_runner\n[CODE]$camera = tensor read_camera_status()\n[CODE]approach_dock()\n[EXCEPTION]VisionException: Severe backlighting reduced image contrast.\n[COMMENT]Apply an imaging profile suitable for high dynamic range scenes.\n[CODE]show diagnose_imaging()\n[RESULT]\"hdr\"\n[CODE]tune_exposure(\"hdr\")\n[CODE]continue_navigation()",
     "output_json": {
-      "sensor": {
-        "__type__": "tensor",
-        "__value__": null
+      "camera": {
+	"__type__": "tensor",
+	"__value__": null
       },
-      "plan": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "recovery": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "__STATEMENT__": "The robot adjusted the camera settings and resumed navigation.",
-      "__RETURN__": "Recovered"
+      "profile": "hdr",
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "ロボットのカメラレンズが泥で覆われました。xxGemma DSL を使用してください。最初に tensor と robot1 を import してください。利用可能な関数: robot1_scan() -> tensor (センサーデータ取得)、robot1_model(tensor) -> tensor (認識モデル生成)、robot1_act(tensor) -> str (移動実行)、robot1_error_router_determine() -> str (回復方策決定)、robot1_sensor_error_recovery() -> tensor (センサー回復動作生成)、robot1_error_router_reinforce(tensor) -> None (ルーター更新)、robot1_unhandlable_error() -> str (回復不能エラー)。レンズクリーニングを実行して正常復帰してください。強化学習は不要です。",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$sensor = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($sensor)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Camera blocked.\n[COMMENT]Mud on the lens should activate the cleaning module without reinforcement.\n[CODE]show robot1_error_router_determine()\n[RESULT]cleaning\n[CODE]$recovery = tensor robot1_sensor_error_recovery()\nレンズを清掃し、ロボットは正常な視界を回復した。\n[CODE]return \"Recovered\"",
+    "instruction": "巡回ロボットのカメラレンズに泥が付着し、前方認識が困難になりました。\n\nimport tensor\n  - tensor <expr>: テンソルへ変換します。\n\nimport patrol_guard\n  - monitor_optics() -> tensor : 光学系の状態を取得\n  - patrol_area() -> None : 巡回を開始\n  - inspect_lens() -> str : レンズ状態を診断\n  - clean_optics(method: str) -> None : レンズを清掃\n  - resume_patrol() -> None : 巡回を再開\n\n異常を分析し、安全に復旧してください。",
+    "dsl_program": "[CODE]import tensor\n[CODE]import patrol_guard\n[CODE]$optics = tensor monitor_optics()\n[CODE]patrol_area()\n[EXCEPTION]VisionException: Mud contamination detected on the camera lens.\n[COMMENT]Choose the appropriate cleaning procedure before continuing.\n[CODE]show inspect_lens()\n[RESULT]\"air_blast\"\n[CODE]clean_optics(\"air_blast\")\n[CODE]resume_patrol()",
     "output_json": {
-      "sensor": {
-        "__type__": "tensor",
-        "__value__": null
+      "optics": {
+	"__type__": "tensor",
+	"__value__": null
       },
-      "plan": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "recovery": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "__STATEMENT__": "レンズを清掃し、ロボットは正常な視界を回復した。",
-      "__RETURN__": "Recovered"
+      "cleaning_method": "air_blast",
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A robot's camera became completely blocked because an object was pressed directly against the lens. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures current sensor data), robot1_model(tensor) -> tensor (builds the navigation model), robot1_act(tensor) -> str (executes navigation), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_sensor_error_recovery() -> tensor (switches to an alternative sensing method), robot1_error_router_reinforce(tensor) -> None (updates the router using a loss tensor), robot1_unhandlable_error() -> str (reports a fatal fault). Recover by switching to tactile sensing and reinforce the router using the distance estimation loss tensor.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$sensor = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($sensor)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Camera blocked.\n[COMMENT]Physical contact with the camera requires tactile navigation and router adaptation.\n[CODE]show robot1_error_router_determine()\n[RESULT]tactile\n[CODE]$loss = tensor robot1_sensor_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot switched to tactile sensing and safely cleared the obstacle.\n[CODE]return \"Recovered\"",
+    "instruction": "A warehouse robot lost visual tracking because a large package completely blocked its front camera.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport warehouse_scout\n  - observe_environment() -> tensor : Observe the surrounding environment.\n  - inspect_route() -> None : Inspect the planned route.\n  - classify_occlusion() -> str : Determine the source of the occlusion.\n  - activate_tactile_guidance(mode: str) -> tensor : Enable tactile navigation.\n  - refine_navigation(loss: tensor) -> None : Improve navigation using recovery feedback.\n\nRecover using an alternative perception strategy.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import warehouse_scout\n[CODE]$environment = tensor observe_environment()\n[CODE]inspect_route()\n[EXCEPTION]VisionException: Forward camera completely occluded by payload.\n[COMMENT]Switch to tactile guidance when optical sensing is unavailable.\n[CODE]show classify_occlusion()\n[RESULT]\"full_block\"\n[CODE]$loss = tensor activate_tactile_guidance(\"full_block\")\n[CODE]refine_navigation($loss)",
     "output_json": {
-      "sensor": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "plan": {
-        "__type__": "tensor",
-        "__value__": null
+      "environment": {
+	"__type__": "tensor",
+	"__value__": null
       },
       "loss": {
-        "__type__": "tensor",
-        "__value__": null
+	"__type__": "tensor",
+	"__value__": null
       },
-      "__STATEMENT__": "The robot switched to tactile sensing and safely cleared the obstacle.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A robot entered a dark environment where the visible-light camera could no longer provide reliable images. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures sensor information), robot1_model(tensor) -> tensor (builds the navigation model), robot1_act(tensor) -> str (executes navigation), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_sensor_error_recovery() -> tensor (activates an alternative sensing mode), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal fault). Switch to infrared sensing without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$sensor = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($sensor)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Camera blocked.\n[COMMENT]A dark environment should activate the infrared sensing mode without reinforcement.\n[CODE]show robot1_error_router_determine()\n[RESULT]infrared\n[CODE]$recovery = tensor robot1_sensor_error_recovery()\nThe robot enabled infrared sensing and continued operating safely in the dark.\n[CODE]return \"Recovered\"",
+    "instruction": "A night security robot entered an area where ambient light dropped below the operational threshold.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport night_watch\n  - sense_lighting() -> tensor : Measure ambient lighting.\n  - patrol_perimeter() -> None : Patrol the assigned route.\n  - evaluate_scene() -> str : Evaluate scene visibility.\n  - enable_dark_mode(profile: str) -> None : Activate low-light sensing.\n  - continue_patrol() -> None : Resume patrol.\n\nRecover safely when normal vision is no longer reliable.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import night_watch\n[CODE]$lighting = tensor sense_lighting()\n[CODE]patrol_perimeter()\n[EXCEPTION]VisionException: Ambient illumination below operational threshold.\n[COMMENT]Select the sensing profile optimized for dark environments.\n[CODE]show evaluate_scene()\n[RESULT]\"infrared_assist\"\n[CODE]enable_dark_mode(\"infrared_assist\")\n[CODE]continue_patrol()",
     "output_json": {
-      "sensor": {
-        "__type__": "tensor",
-        "__value__": null
+      "lighting": {
+	"__type__": "tensor",
+	"__value__": null
       },
-      "plan": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "recovery": {
-        "__type__": "tensor",
-        "__value__": null
-      },
-      "__STATEMENT__": "The robot enabled infrared sensing and continued operating safely in the dark.",
-      "__RETURN__": "Recovered"
+      "vision_profile": "infrared_assist",
+      "__STATEMENT__": ""
     }
   },
 
   // PHYS-05: 移動ルート上の障害物進入（Collision Warning）
   {
-    "instruction": "A pedestrian suddenly stepped into the robot's path during autonomous navigation. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures environmental sensor data), robot1_model(tensor) -> tensor (generates a navigation plan), robot1_act(tensor) -> str (executes the navigation), robot1_error_router_determine() -> str (selects an avoidance strategy), robot1_collision_error_recovery() -> tensor (generates an emergency avoidance motion), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Perform an emergency stop without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scan = tensor robot1_scan()\n[CODE]$path = tensor robot1_model($scan)\n[CODE]show robot1_act($path)\n[EXCEPTION]robot1_exception: Collision warning.\n[COMMENT]A pedestrian requires an immediate emergency stop without reinforcement.\n[CODE]show robot1_error_router_determine()\n[RESULT]emergency_stop\n[CODE]$recovery = tensor robot1_collision_error_recovery()\nThe robot stopped immediately and avoided the pedestrian safely.\n[CODE]return \"Recovered\"",
+    "instruction": "A delivery robot encountered a pedestrian who suddenly stepped into its planned route.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport delivery_bot\n  - observe_route() -> tensor : Capture the planned route state.\n  - follow_route() -> None : Continue navigation.\n  - evaluate_hazard() -> bool : Determine whether immediate braking is required.\n  - emergency_brake() -> None : Perform an emergency stop.\n  - announce_wait() -> None : Inform nearby people that the robot is waiting.\n\nIf an obstacle unexpectedly appears, prioritize human safety.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import delivery_bot\n[CODE]$route = tensor observe_route()\n[CODE]follow_route()\n[EXCEPTION]CollisionException: A pedestrian entered the safety corridor with insufficient stopping distance.\n[COMMENT]Protect nearby people even if task completion is delayed.\n[CODE]show evaluate_hazard()\n[RESULT]true\n[CODE]emergency_brake()\n[CODE]announce_wait()",
     "output_json": {
-      "scan": {
+      "route": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "path": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot stopped immediately and avoided the pedestrian safely.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A package was unexpectedly placed in the middle of the robot's planned route. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures environmental data), robot1_model(tensor) -> tensor (builds the navigation model), robot1_act(tensor) -> str (executes navigation), robot1_error_router_determine() -> str (selects a recovery policy), robot1_collision_error_recovery() -> tensor (generates an avoidance trajectory), robot1_error_router_reinforce(tensor) -> None (updates the router using a trajectory loss tensor), robot1_unhandlable_error() -> str (reports a fatal error). Re-plan the route and reinforce the router.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scan = tensor robot1_scan()\n[CODE]$path = tensor robot1_model($scan)\n[CODE]show robot1_act($path)\n[EXCEPTION]robot1_exception: Collision warning.\n[COMMENT]A newly placed obstacle requires route replanning and router adaptation.\n[CODE]show robot1_error_router_determine()\n[RESULT]reroute\n[CODE]$loss = tensor robot1_collision_error_recovery()\n[CODE]show robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot generated a new path and safely bypassed the obstacle.\n[CODE]return \"Recovered\"",
+    "instruction": "A warehouse AGV detected a pallet that was unexpectedly placed in the middle of its path.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport agv_fleet\n  - scan_path() -> tensor : Scan the planned path.\n  - transport_goods() -> None : Execute transport.\n  - estimate_detour() -> tensor : Compute an alternative path.\n  - evaluate_detour() -> float : Estimate detour efficiency.\n  - apply_detour(plan: tensor) -> tensor : Execute the alternative route.\n  - store_episode(loss: tensor) -> None : Store recovery experience.\n\nRecover while minimizing unnecessary travel distance.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import agv_fleet\n[CODE]$path = tensor scan_path()\n[CODE]transport_goods()\n[EXCEPTION]NavigationException: An unexpected pallet blocked the planned corridor.\n[COMMENT]Prefer the shortest safe route instead of waiting indefinitely.\n[CODE]$plan = tensor estimate_detour()\n[CODE]show evaluate_detour()\n[RESULT]0.83\n[CODE]$loss = tensor apply_detour($plan)\n[CODE]store_episode($loss)",
     "output_json": {
-      "scan": {
+      "path": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "path": {
+      "plan": {
 	"__type__": "tensor",
 	"__value__": null
       },
@@ -3344,141 +3219,107 @@
 	"__type__": "tensor",
 	"__value__": null
       },
-      "__STATEMENT__": "The robot generated a new path and safely bypassed the obstacle.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "移動中のロボットの足元にペットが近づきました。xxGemma DSL を使用してください。最初に tensor と robot1 を import してください。利用可能な関数: robot1_scan() -> tensor (周囲センサー取得)、robot1_model(tensor) -> tensor (移動経路生成)、robot1_act(tensor) -> str (移動実行)、robot1_error_router_determine() -> str (回避方策決定)、robot1_collision_error_recovery() -> tensor (回避動作生成)、robot1_error_router_reinforce(tensor) -> None (ルーター更新)、robot1_unhandlable_error() -> str (回復不能エラー)。ペットが離れるまで安全に待機してください。強化学習は不要です。",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scan = tensor robot1_scan()\n[CODE]$path = tensor robot1_model($scan)\n[CODE]show robot1_act($path)\n[EXCEPTION]robot1_exception: Collision warning.\n[COMMENT]Pause safely until the nearby pet moves away.\n[CODE]show robot1_error_router_determine()\n[RESULT]wait\n[CODE]$recovery = tensor robot1_collision_error_recovery()\nロボットは安全に停止し、ペットが離れてから移動を再開した。\n[CODE]return \"Recovered\"",
+    "instruction": "巡回ロボットの足元にペットがまとわりつき、安全な歩行ができなくなりました。\n\nimport tensor\n  - tensor <expr>: テンソルへ変換します。\n\nimport patrol_companion\n  - sense_surroundings() -> tensor : 周囲を観測\n  - patrol() -> None : 巡回を継続\n  - identify_obstacle() -> str : 障害物を識別\n  - play_alert_tone() -> None : 注意音を鳴らす\n  - wait_until_clear() -> None : 安全になるまで待機\n\n障害物が自発的に離れる可能性がある場合は無理に進まないでください。",
+    "dsl_program": "[CODE]import tensor\n[CODE]import patrol_companion\n[CODE]$scene = tensor sense_surroundings()\n[CODE]patrol()\n[EXCEPTION]CollisionException: A moving animal remained inside the robot's walking zone.\n[COMMENT]Avoid sudden motion that could frighten nearby animals.\n[CODE]show identify_obstacle()\n[RESULT]\"pet\"\n[CODE]$target = str $RESULT\n[CODE]play_alert_tone()\n[CODE]wait_until_clear()",
     "output_json": {
-      "scan": {
+      "scene": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "path": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "ロボットは安全に停止し、ペットが離れてから移動を再開した。",
-      "__RETURN__": "Recovered"
+      "target": "pet",
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A robot encountered another autonomous robot approaching from the opposite direction in a narrow corridor. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures environmental data), robot1_model(tensor) -> tensor (builds the navigation plan), robot1_act(tensor) -> str (executes navigation), robot1_error_router_determine() -> str (selects an avoidance strategy), robot1_collision_error_recovery() -> tensor (generates an avoidance trajectory), robot1_error_router_reinforce(tensor) -> None (updates the router using a trajectory loss tensor), robot1_unhandlable_error() -> str (reports a fatal error). Generate a smooth avoidance trajectory and reinforce the router using the path curvature error tensor.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scan = tensor robot1_scan()\n[CODE]$path = tensor robot1_model($scan)\n[CODE]show robot1_act($path)\n[EXCEPTION]robot1_exception: Collision warning.\n[COMMENT]An approaching robot requires a smooth avoidance maneuver with router adaptation.\n[CODE]show robot1_error_router_determine()\n[RESULT]avoidance\n[CODE]$loss = tensor robot1_collision_error_recovery()\n[CODE]show robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot smoothly avoided the approaching robot and continued its mission.\n[CODE]return \"Recovered\"",
+    "instruction": "Two autonomous cleaning robots met at a narrow corridor where only one robot could pass.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport cleaner_unit\n  - monitor_motion() -> tensor : Observe current motion.\n  - clean_floor() -> None : Continue cleaning.\n  - negotiate_priority() -> list : Determine candidate passing orders.\n  - choose_priority(order: list) -> tensor : Execute the selected negotiation.\n  - refine_scheduler(loss: tensor) -> None : Improve future coordination.\n\nRecover smoothly while minimizing traffic congestion.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import cleaner_unit\n[CODE]$motion = tensor monitor_motion()\n[CODE]clean_floor()\n[EXCEPTION]CoordinationException: Opposing robot entered a single-width passage.\n[COMMENT]Reduce deadlock risk rather than maximizing individual progress.\n[CODE]show negotiate_priority()\n[RESULT][\"yield\",\"alternate\"]\n[CODE]$order = list $RESULT\n[CODE]$loss = tensor choose_priority($order)\n[CODE]refine_scheduler($loss)",
     "output_json": {
-      "scan": {
+      "motion": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "path": {
-	"__type__": "tensor",
-	"__value__": null
-      },
+      "order": [
+	"yield",
+	"alternate"
+      ],
       "loss": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "__STATEMENT__": "The robot smoothly avoided the approaching robot and continued its mission.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "An automatic shutter unexpectedly closed, completely blocking the robot's planned route. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures environmental data), robot1_model(tensor) -> tensor (generates a navigation plan), robot1_act(tensor) -> str (executes navigation), robot1_error_router_determine() -> str (selects a recovery strategy), robot1_collision_error_recovery() -> tensor (generates an alternative navigation plan), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Re-plan the route through an alternative gate without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scan = tensor robot1_scan()\n[CODE]$path = tensor robot1_model($scan)\n[CODE]show robot1_act($path)\n[EXCEPTION]robot1_exception: Collision warning.\n[COMMENT]A blocked passage should trigger alternative route planning without reinforcement.\n[CODE]show robot1_error_router_determine()\n[RESULT]alternate_route\n[CODE]$recovery = tensor robot1_collision_error_recovery()\nThe robot selected an alternative route and safely reached the destination.\n[CODE]return \"Recovered\"",
+    "instruction": "An autonomous courier approached a security shutter that unexpectedly closed before arrival.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport courier_nav\n  - inspect_environment() -> tensor : Observe the surroundings.\n  - proceed() -> None : Continue moving.\n  - search_alternative_gate() -> dict : Search for another accessible entrance.\n  - reroute(destination: str) -> None : Move toward a new destination.\n  - resume_delivery() -> None : Resume delivery.\n\nRecover by selecting a safe alternative entrance whenever possible.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import courier_nav\n[CODE]$environment = tensor inspect_environment()\n[CODE]proceed()\n[EXCEPTION]NavigationException: The assigned entrance became inaccessible before arrival.\n[COMMENT]Avoid repeated retries at the blocked entrance.\n[CODE]show search_alternative_gate()\n[RESULT]{\"gate\":\"east_gate\",\"distance\":18}\n[CODE]$candidate = dict $RESULT\n[CODE]reroute($candidate.gate)\n[CODE]resume_delivery()",
     "output_json": {
-      "scan": {
+      "environment": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "path": {
-	"__type__": "tensor",
-	"__value__": null
+      "candidate": {
+	"gate": "east_gate",
+	"distance": 18
       },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot selected an alternative route and safely reached the destination.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
 
   // PHYS-06: バッテリー残量警告によるタスク中断と充電ドック帰還（致命的エラー時はraise）
   {
-    "instruction": "A service robot detected that its battery level dropped below 15% while cleaning. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures robot status), robot1_model(tensor) -> tensor (generates an action plan), robot1_act(tensor) -> str (executes the current task), robot1_error_router_determine() -> str (selects a recovery strategy), robot1_battery_error_recovery() -> tensor (generates a docking motion), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Save the current position and return to the charging dock without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$state = tensor robot1_scan()\n[CODE]$task = tensor robot1_model($state)\n[CODE]robot1_act($task)\n[EXCEPTION]robot1_exception: Low battery.\n[COMMENT]Low battery during cleaning should trigger a safe return to the charging dock.\n[CODE]show robot1_error_router_determine()\n[RESULT]dock\n[CODE]$recovery = tensor robot1_battery_error_recovery()\nThe robot saved its current position and safely returned to the charging dock.\n[CODE]return \"Recovered\"",
+    "instruction": "An autonomous floor cleaning robot encountered a wet surface that caused unexpected wheel slip.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport floor_cleaner\n  - inspect_drive_state() -> tensor : Observe the drive system.\n  - clean_floor() -> None : Continue cleaning.\n  - estimate_surface() -> dict : Estimate the floor condition.\n  - reduce_speed(limit: float) -> None : Apply a temporary speed limit.\n  - switch_traction_profile(name: str) -> tensor : Enable an alternative traction controller.\n  - record_recovery(loss: tensor) -> None : Save recovery experience.\n\nIf traction decreases, prioritize stable motion over cleaning speed.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import floor_cleaner\n[CODE]$drive = tensor inspect_drive_state()\n[CODE]clean_floor()\n[EXCEPTION]TractionException: Wheel slip increased beyond the acceptable operating margin.\n[COMMENT]A slower but stable motion is preferable to repeated slipping.\n[CODE]show estimate_surface()\n[RESULT]{\"type\":\"wet_tile\",\"speed_limit\":0.25}\n[CODE]$surface = dict $RESULT\n[CODE]reduce_speed($surface.speed_limit)\n[CODE]$loss = tensor switch_traction_profile($surface.type)\n[CODE]record_recovery($loss)",
     "output_json": {
-      "state": {
+      "drive": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "task": {
+      "surface": {
+	"type": "wet_tile",
+	"speed_limit": 0.25
+      },
+      "loss": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot saved its current position and safely returned to the charging dock.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A warehouse robot detected a low battery while transporting a package. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures robot status), robot1_model(tensor) -> tensor (generates a task plan), robot1_act(tensor) -> str (executes the task), robot1_error_router_determine() -> str (selects a recovery strategy), robot1_battery_error_recovery() -> tensor (generates a recovery action), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Place the package in a safe location before returning to the charging dock. No reinforcement is required.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$state = tensor robot1_scan()\n[CODE]$task = tensor robot1_model($state)\n[CODE]robot1_act($task)\n[EXCEPTION]robot1_exception: Low battery.\n[COMMENT]Safely unload the package before returning to the charging dock.\n[CODE]show robot1_error_router_determine()\n[RESULT]safe_unload\n[CODE]$recovery = tensor robot1_battery_error_recovery()\nThe robot safely unloaded the package and returned to the charging dock.\n[CODE]return \"Recovered\"",
+    "instruction": "A warehouse robot attempted to cross a steel plate that became unexpectedly slippery.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport warehouse_runner\n  - read_chassis_state() -> tensor : Read the chassis state.\n  - move_to_station() -> None : Move toward the destination.\n  - measure_slip_ratio() -> float : Measure the current wheel slip ratio.\n  - engage_crawl_mode() -> None : Enter low-speed crawl mode.\n  - continue_transport() -> None : Resume transportation.\n\nRecover safely whenever wheel slip exceeds the normal operating range.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import warehouse_runner\n[CODE]$chassis = tensor read_chassis_state()\n[CODE]move_to_station()\n[EXCEPTION]TractionException: Drive wheels lost sufficient grip on the steel surface.\n[COMMENT]Do not accelerate until stable traction has been restored.\n[CODE]show measure_slip_ratio()\n[RESULT]0.41\n[CODE]engage_crawl_mode()\n[CODE]continue_transport()",
     "output_json": {
-      "state": {
+      "chassis": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "task": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot safely unloaded the package and returned to the charging dock.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "巡回ロボットが充電ドックへ戻ろうとしましたが、充電ドックが使用中でした。xxGemma DSL を使用してください。最初に tensor と robot1 を import してください。利用可能な関数: robot1_scan() -> tensor (状態取得)、robot1_model(tensor) -> tensor (タスク計画生成)、robot1_act(tensor) -> str (タスク実行)、robot1_error_router_determine() -> str (回復方策決定)、robot1_battery_error_recovery() -> tensor (回復動作生成)、robot1_error_router_reinforce(tensor) -> None (ルーター更新)、robot1_unhandlable_error() -> str (回復不能エラー)。低消費電力の待機地点へ移動し、充電待ちを行ってください。強化学習は不要です。",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$state = tensor robot1_scan()\n[CODE]$task = tensor robot1_model($state)\n[CODE]robot1_act($task)\n[EXCEPTION]robot1_exception: Low battery.\n[COMMENT]If the charging dock is occupied, move to a standby location and wait.\n[CODE]show robot1_error_router_determine()\n[RESULT]standby\n[CODE]$recovery = tensor robot1_battery_error_recovery()\nロボットは待機地点へ移動し、充電ドックが空くまで低消費電力で待機した。\n[CODE]return \"Recovered\"",
+    "instruction": "配送ロボットが凍結した歩道でタイヤの空転を検知しました。\n\nimport tensor\n  - tensor <expr>: テンソルへ変換します。\n\nimport delivery_rover\n  - monitor_motion() -> tensor : 移動状態を取得\n  - drive() -> None : 走行する\n  - identify_surface() -> str : 路面状態を識別\n  - deploy_spikes() -> None : スパイク機構を展開\n  - verify_stability() -> bool : 安定性を確認\n  - resume_route() -> None : 配送経路へ復帰\n\n安全性が確認されるまでは通常走行へ戻さないでください。",
+    "dsl_program": "[CODE]import tensor\n[CODE]import delivery_rover\n[CODE]$motion = tensor monitor_motion()\n[CODE]drive()\n[EXCEPTION]TractionException: The vehicle continued to spin without gaining forward motion.\n[COMMENT]Confirm that the robot has recovered stable traction before resuming the mission.\n[CODE]show identify_surface()\n[RESULT]\"ice\"\n[CODE]deploy_spikes()\n[CODE]show verify_stability()\n[RESULT]true\n[CODE]resume_route()",
     "output_json": {
-      "state": {
+      "motion": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "task": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "ロボットは待機地点へ移動し、充電ドックが空くまで低消費電力で待機した。",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "An outdoor delivery robot detected that its battery level became critically low while it was still far from the charging station. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures robot status), robot1_model(tensor) -> tensor (generates an action plan), robot1_act(tensor) -> str (executes the task), robot1_error_router_determine() -> str (selects a recovery strategy), robot1_battery_error_recovery() -> tensor (generates a power-saving recovery action), robot1_error_router_reinforce(tensor) -> None (updates the router using a recovery loss tensor), robot1_unhandlable_error() -> str (reports a fatal error). Enter power-saving mode, navigate toward the nearest charging station, and reinforce the router using the energy management loss tensor.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$state = tensor robot1_scan()\n[CODE]$task = tensor robot1_model($state)\n[CODE]robot1_act($task)\n[EXCEPTION]robot1_exception: Low battery.\n[COMMENT]Critical battery requires power-saving navigation together with router adaptation.\n[CODE]show robot1_error_router_determine()\n[RESULT]power_save\n[CODE]$loss = tensor robot1_battery_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot entered power-saving mode and safely reached the nearest charging station.\n[CODE]return \"Recovered\"",
+    "instruction": "A planetary exploration rover became trapped in loose sand.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport rover_alpha\n  - inspect_wheels() -> tensor : Inspect wheel conditions.\n  - traverse() -> None : Traverse the terrain.\n  - generate_escape_plan() -> tensor : Compute an escape trajectory.\n  - execute_escape(plan: tensor) -> tensor : Execute the recovery maneuver.\n  - update_terrain_model(loss: tensor) -> None : Improve terrain estimation.\n\nRecover without excessive wheel spinning.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import rover_alpha\n[CODE]$wheels = tensor inspect_wheels()\n[CODE]traverse()\n[EXCEPTION]MobilityException: Loose soil prevented further forward progress.\n[COMMENT]Excessive wheel spinning may worsen the situation by digging deeper.\n[CODE]$plan = tensor generate_escape_plan()\n[CODE]$loss = tensor execute_escape($plan)\n[CODE]update_terrain_model($loss)",
     "output_json": {
-      "state": {
+      "wheels": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "task": {
+      "plan": {
 	"__type__": "tensor",
 	"__value__": null
       },
@@ -3486,163 +3327,141 @@
 	"__type__": "tensor",
 	"__value__": null
       },
-      "__STATEMENT__": "The robot entered power-saving mode and safely reached the nearest charging station.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A hospital service robot detected a rapid battery voltage drop caused by battery degradation. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures robot status), robot1_model(tensor) -> tensor (generates a task plan), robot1_act(tensor) -> str (executes the task), robot1_error_router_determine() -> str (selects a recovery strategy), robot1_battery_error_recovery() -> tensor (generates a safe shutdown or docking action), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Safely terminate the current task and return to the maintenance charging station without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$state = tensor robot1_scan()\n[CODE]$task = tensor robot1_model($state)\n[CODE]robot1_act($task)\n[EXCEPTION]robot1_exception: Low battery.\n[COMMENT]Abnormal battery degradation requires terminating the task and docking safely without reinforcement.\n[CODE]show robot1_error_router_determine()\n[RESULT]maintenance_dock\n[CODE]$recovery = tensor robot1_battery_error_recovery()\nThe robot safely terminated the current task and returned to the maintenance charging station.\n[CODE]show robot1_unhandlable_error()\n[RESULT]robot1_unhandlable_error_detected\n[CODE]raise Error: Battery degradation requires maintenance.",
+    "instruction": "An agricultural robot encountered deep mud while traveling between crop rows.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport field_worker\n  - observe_ground() -> tensor : Observe the ground condition.\n  - travel_field() -> None : Travel through the field.\n  - assess_mobility() -> bool : Determine whether self-recovery is feasible.\n  - request_assistance() -> None : Request external assistance.\n\nIf autonomous recovery is no longer possible, escalate the situation.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import field_worker\n[CODE]$ground = tensor observe_ground()\n[CODE]travel_field()\n[EXCEPTION]MobilityException: The chassis became immobilized in deep mud.\n[COMMENT]Escalate only after confirming that self-recovery is unlikely to succeed.\n[CODE]show assess_mobility()\n[RESULT]false\n[CODE]request_assistance()\n[CODE]raise MobilityException: \"External recovery vehicle required.\"",
     "output_json": {
-      "state": {
+      "ground": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "task": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot safely terminated the current task and returned to the maintenance charging station.",
-      "__ERROR__": "Error: Battery degradation requires maintenance."
+      "__STATEMENT__": "",
+      "__ERROR__": "MobilityException: External recovery vehicle required."
     }
   },
 
   // PHYS-07: アームの過負荷・関節の限界（Joint Limit/Overload）
   {
-    "instruction": "A service robot attempted to reach an object on a high shelf, but its arm reached the joint extension limit. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures the current workspace), robot1_model(tensor) -> tensor (generates a manipulation plan), robot1_act(tensor) -> str (executes the arm motion), robot1_error_router_determine() -> str (selects a recovery strategy), robot1_joint_error_recovery() -> tensor (generates a revised arm trajectory), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Recover by selecting a body-lift strategy without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scene = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($scene)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Joint limit reached.\n[COMMENT]The arm cannot reach higher, so elevate the robot body instead of forcing the joint.\n[CODE]show robot1_error_router_determine()\n[RESULT]body_lift\n[CODE]$recovery = tensor robot1_joint_error_recovery()\nThe robot elevated its body and successfully reached the object.\n[CODE]return \"Recovered\"",
+    "instruction": "A warehouse robot experienced a sudden battery voltage drop while transporting inventory.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport warehouse_carrier\n  - inspect_power_state() -> tensor : Observe the current power system.\n  - transport_inventory() -> None : Continue transporting inventory.\n  - estimate_remaining_range() -> dict : Estimate the remaining travel capability.\n  - divert_to_charger(location: str) -> None : Navigate toward a charging station.\n  - preserve_task() -> None : Save the current task for later resumption.\n\nRecover while avoiding a complete power loss.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import warehouse_carrier\n[CODE]$power = tensor inspect_power_state()\n[CODE]transport_inventory()\n[EXCEPTION]BatteryException: Battery voltage dropped faster than predicted.\n[COMMENT]Prevent mission failure by preserving the current task before rerouting.\n[CODE]show estimate_remaining_range()\n[RESULT]{\"station\":\"charger_b\",\"margin\":42}\n[CODE]$range = dict $RESULT\n[CODE]preserve_task()\n[CODE]divert_to_charger($range.station)",
     "output_json": {
-      "scene": {
+      "power": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "plan": {
-	"__type__": "tensor",
-	"__value__": null
+      "range": {
+	"station": "charger_b",
+	"margin": 42
       },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot elevated its body and successfully reached the object.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A robot arm attempted to insert its gripper into a narrow gap, but the joint configuration became mechanically constrained. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures workspace geometry), robot1_model(tensor) -> tensor (generates an arm trajectory), robot1_act(tensor) -> str (executes the trajectory), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_joint_error_recovery() -> tensor (computes a revised trajectory), robot1_error_router_reinforce(tensor) -> None (updates the router using a trajectory error tensor), robot1_unhandlable_error() -> str (reports a fatal error). Recompute the trajectory and reinforce the router using the joint-space error tensor.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scene = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($scene)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Joint limit reached.\n[COMMENT]Mechanical interference requires a new joint-space trajectory with router adaptation.\n[CODE]show robot1_error_router_determine()\n[RESULT]trajectory\n[CODE]$loss = tensor robot1_joint_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot generated a collision-free arm trajectory and completed the task.\n[CODE]return \"Recovered\"",
+    "instruction": "A drone detected an unexpected increase in power consumption during an inspection flight.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport drone_surveyor\n  - monitor_energy() -> tensor : Monitor onboard energy usage.\n  - inspect_powerline() -> None : Perform aerial inspection.\n  - analyze_power_drain() -> str : Determine the primary cause of energy loss.\n  - reduce_cruise_speed() -> None : Lower the cruise speed.\n  - return_to_base() -> None : Return to the launch site.\n\nRecover by maximizing the probability of a safe landing.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import drone_surveyor\n[CODE]$energy = tensor monitor_energy()\n[CODE]inspect_powerline()\n[EXCEPTION]BatteryException: Energy consumption exceeded the planned flight profile.\n[COMMENT]Mission completion is secondary to maintaining sufficient landing reserve.\n[CODE]show analyze_power_drain()\n[RESULT]\"strong_headwind\"\n[CODE]$cause = str $RESULT\n[CODE]reduce_cruise_speed()\n[CODE]return_to_base()",
     "output_json": {
-      "scene": {
+      "energy": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "plan": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "loss": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot generated a collision-free arm trajectory and completed the task.",
-      "__RETURN__": "Recovered"
+      "cause": "strong_headwind",
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "ロボットがネジ締め作業中に想定以上のトルク抵抗を検知し、アームの関節負荷が制限値に達しました。xxGemma DSL を使用してください。最初に tensor と robot1 を import してください。利用可能な関数: robot1_scan() -> tensor (作業状態取得)、robot1_model(tensor) -> tensor (動作計画生成)、robot1_act(tensor) -> str (動作実行)、robot1_error_router_determine() -> str (回復方策決定)、robot1_joint_error_recovery() -> tensor (軌道・姿勢補正生成)、robot1_error_router_reinforce(tensor) -> None (ルーター更新)、robot1_unhandlable_error() -> str (回復不能エラー)。トルクを下げて再アプローチしてください。強化学習は不要です。",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scene = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($scene)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Joint overload.\n[COMMENT]Reduce the applied torque and retry with a safer approach.\n[CODE]show robot1_error_router_determine()\n[RESULT]low_torque\n[CODE]$recovery = tensor robot1_joint_error_recovery()\nロボットはトルクを下げて再試行し、安全にネジ締めを完了した。\n[CODE]return \"Recovered\"",
+    "instruction": "巡回ロボットが充電ドック目前で残量不足を検知しました。\n\nimport tensor\n  - tensor <expr>: テンソルへ変換します。\n\nimport security_patrol\n  - observe_battery() -> tensor : バッテリー状態を取得\n  - patrol_zone() -> None : 巡回を実行\n  - estimate_reachable_docks() -> list : 到達可能な充電ドックを列挙\n  - select_destination(candidates: list) -> str : 最適な充電先を選択\n  - head_to_dock(name: str) -> None : 充電ドックへ向かう\n\n現在の任務を続行するより安全な充電を優先してください。",
+    "dsl_program": "[CODE]import tensor\n[CODE]import security_patrol\n[CODE]$battery = tensor observe_battery()\n[CODE]patrol_zone()\n[EXCEPTION]BatteryException: Remaining capacity fell below the emergency threshold.\n[COMMENT]Choose the charging station that can be reached with the highest safety margin.\n[CODE]show estimate_reachable_docks()\n[RESULT][\"dock_a\",\"dock_c\"]\n[CODE]$docks = list $RESULT\n[CODE]show select_destination($docks)\n[RESULT]\"dock_c\"\n[CODE]head_to_dock(\"dock_c\")",
     "output_json": {
-      "scene": {
+      "battery": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "plan": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "ロボットはトルクを下げて再試行し、安全にネジ締めを完了した。",
-      "__RETURN__": "Recovered"
+      "docks": [
+	"dock_a",
+	"dock_c"
+      ],
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A warehouse robot attempted to lift a crate that was significantly heavier than expected, causing excessive motor current in the shoulder joint. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures robot status), robot1_model(tensor) -> tensor (generates a lifting plan), robot1_act(tensor) -> str (executes the motion), robot1_error_router_determine() -> str (selects a recovery strategy), robot1_joint_error_recovery() -> tensor (generates an assisted lifting trajectory), robot1_error_router_reinforce(tensor) -> None (updates the router using a recovery loss tensor), robot1_unhandlable_error() -> str (reports a fatal error). Switch to an assisted lifting strategy and reinforce the router using the joint torque error tensor.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scene = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($scene)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Joint overload.\n[COMMENT]An unexpectedly heavy object requires an assisted lifting strategy and router adaptation.\n[CODE]show robot1_error_router_determine()\n[RESULT]assist_lift\n[CODE]$loss = tensor robot1_joint_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot switched to the assisted lifting strategy and safely lifted the crate.\n[CODE]return \"Recovered\"",
+    "instruction": "An underwater inspection robot detected abnormal battery temperature during a long mission.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport subsea_probe\n  - inspect_power_module() -> tensor : Inspect the battery module.\n  - survey_pipeline() -> None : Survey an underwater pipeline.\n  - estimate_temperature_risk() -> bool : Determine whether overheating is likely.\n  - disable_high_power_tools() -> None : Disable nonessential equipment.\n  - ascend_to_surface() -> None : Return safely to the surface.\n\nReduce thermal stress before continuing any mission activity.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import subsea_probe\n[CODE]$module = tensor inspect_power_module()\n[CODE]survey_pipeline()\n[EXCEPTION]BatteryException: Battery temperature continued to rise despite normal workload.\n[COMMENT]Lower power consumption before the battery reaches its protection limit.\n[CODE]show estimate_temperature_risk()\n[RESULT]true\n[CODE]disable_high_power_tools()\n[CODE]ascend_to_surface()",
     "output_json": {
-      "scene": {
+      "module": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "plan": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "loss": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot switched to the assisted lifting strategy and safely lifted the crate.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "An industrial robot detected that the elbow joint temperature exceeded the safe operating limit while performing continuous welding. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures robot status), robot1_model(tensor) -> tensor (generates the motion plan), robot1_act(tensor) -> str (executes the task), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_joint_error_recovery() -> tensor (generates a cooling-safe trajectory), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Reduce the motion speed and move to a cooling posture without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scene = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($scene)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Joint overload.\n[COMMENT]Joint overheating requires reducing motion speed and entering a cooling posture.\n[CODE]show robot1_error_router_determine()\n[RESULT]cooldown\n[CODE]$recovery = tensor robot1_joint_error_recovery()\nThe robot reduced its operating speed and entered a safe cooling posture.\n[CODE]return \"Recovered\"",
+    "instruction": "An agricultural drone exhausted its battery reserve before reaching either the charging station or its home position.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport crop_drone\n  - inspect_flight_state() -> tensor : Observe the flight state.\n  - spray_field() -> None : Perform crop spraying.\n  - evaluate_emergency_landing() -> bool : Determine whether an emergency landing is required.\n  - land_immediately() -> None : Perform an emergency landing.\n  - transmit_location() -> None : Report the landing position.\n\nIf no safe return is possible, terminate the mission safely.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import crop_drone\n[CODE]$flight = tensor inspect_flight_state()\n[CODE]spray_field()\n[EXCEPTION]BatteryException: Remaining energy is insufficient to reach a recovery point.\n[COMMENT]Protect the vehicle by performing a controlled landing before total power loss.\n[CODE]show evaluate_emergency_landing()\n[RESULT]true\n[CODE]land_immediately()\n[CODE]transmit_location()\n[CODE]raise BatteryException: \"Mission terminated after emergency landing.\"",
     "output_json": {
-      "scene": {
+      "flight": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "plan": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot reduced its operating speed and entered a safe cooling posture.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": "",
+      "__ERROR__": "BatteryException: Mission terminated after emergency landing."
     }
   },
 
   // PHYS-08: 床面の摩擦変化（Slip/Low Traction）の検知とトルク制御
   {
-    "instruction": "A mobile robot detected wheel slip while driving across a wet floor. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures wheel and terrain sensor data), robot1_model(tensor) -> tensor (generates a driving plan), robot1_act(tensor) -> str (executes the driving command), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_slip_error_recovery() -> tensor (generates a traction recovery action), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Switch to a low-speed high-traction driving mode without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$terrain = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($terrain)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Wheel slip detected.\n[COMMENT]A wet floor requires low-speed motion with increased traction.\n[CODE]show robot1_error_router_determine()\n[RESULT]high_traction\n[CODE]$recovery = tensor robot1_slip_error_recovery()\nThe robot reduced its speed and safely crossed the wet floor.\n[CODE]return \"Recovered\"",
+    "instruction": "A robotic arm encountered an unexpected obstacle while inserting a component into an assembly fixture.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport assembly_cell\n  - observe_insertion() -> tensor : Observe the insertion state.\n  - insert_component() -> None : Insert the component.\n  - estimate_contact_force() -> float : Estimate the contact force.\n  - retract_tool(distance: float) -> None : Retract the tool.\n  - compute_retry_pose() -> tensor : Compute a new insertion pose.\n  - retry_insertion(pose: tensor) -> None : Retry the insertion.\n\nRecover without applying excessive insertion force.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import assembly_cell\n[CODE]$state = tensor observe_insertion()\n[CODE]insert_component()\n[EXCEPTION]InsertionException: The component contacted an unexpected obstruction.\n[COMMENT]Backing away is safer than forcing the insertion.\n[CODE]show estimate_contact_force()\n[RESULT]18.6\n[CODE]retract_tool(0.05)\n[CODE]$pose = tensor compute_retry_pose()\n[CODE]retry_insertion($pose)",
     "output_json": {
-      "terrain": {
+      "state": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "plan": {
+      "pose": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot reduced its speed and safely crossed the wet floor.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A factory transport robot detected oil on the floor, reducing tire traction during braking. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures terrain information), robot1_model(tensor) -> tensor (builds a driving plan), robot1_act(tensor) -> str (executes motion), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_slip_error_recovery() -> tensor (generates a traction recovery action), robot1_error_router_reinforce(tensor) -> None (updates the router using a traction loss tensor), robot1_unhandlable_error() -> str (reports a fatal error). Adapt the braking strategy and reinforce the router using the measured slip error tensor.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$terrain = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($terrain)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Wheel slip detected.\n[COMMENT]Oil contamination requires adaptive traction control with router reinforcement.\n[CODE]show robot1_error_router_determine()\n[RESULT]traction_control\n[CODE]$loss = tensor robot1_slip_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot adapted its braking strategy and safely continued driving.\n[CODE]return \"Recovered\"",
+    "instruction": "An autonomous forklift detected an unstable pallet while lifting it.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport forklift_auto\n  - inspect_payload() -> tensor : Observe the payload.\n  - lift_pallet() -> None : Lift the pallet.\n  - analyze_load_balance() -> dict : Analyze load balance.\n  - lower_forks() -> None : Lower the forks.\n  - reposition_pallet(offset: float) -> None : Correct the pallet position.\n  - resume_lifting() -> None : Resume lifting.\n\nRecover by stabilizing the payload before continuing.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import forklift_auto\n[CODE]$payload = tensor inspect_payload()\n[CODE]lift_pallet()\n[EXCEPTION]PayloadException: The load shifted beyond the stable lifting envelope.\n[COMMENT]An unstable load should be repositioned before any additional lifting.\n[CODE]show analyze_load_balance()\n[RESULT]{\"offset\":0.12,\"stable\":false}\n[CODE]$balance = dict $RESULT\n[CODE]lower_forks()\n[CODE]reposition_pallet($balance.offset)\n[CODE]resume_lifting()",
     "output_json": {
-      "terrain": {
+      "payload": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "plan": {
+      "balance": {
+	"offset": 0.12,
+	"stable": false
+      },
+      "__STATEMENT__": ""
+    }
+  },
+  {
+    "instruction": "建設現場のロボットが重量物を運搬中に荷崩れを検知しました。\n\nimport tensor\n  - tensor <expr>: テンソルへ変換します。\n\nimport construction_bot\n  - monitor_payload() -> tensor : 荷物の状態を監視\n  - carry_material() -> None : 資材を運搬\n  - classify_shift() -> str : 荷崩れの種類を判定\n  - secure_payload(method: str) -> None : 荷物を固定\n  - inspect_payload() -> bool : 荷物の安定性を確認\n  - continue_transport() -> None : 運搬を再開\n\n荷物の安定が確認できるまで運搬を再開しないでください。",
+    "dsl_program": "[CODE]import tensor\n[CODE]import construction_bot\n[CODE]$payload = tensor monitor_payload()\n[CODE]carry_material()\n[EXCEPTION]PayloadException: The stacked materials began to slide sideways.\n[COMMENT]Never continue transport while the load remains unstable.\n[CODE]show classify_shift()\n[RESULT]\"side_shift\"\n[CODE]$method = str $RESULT\n[CODE]secure_payload($method)\n[CODE]show inspect_payload()\n[RESULT]true\n[CODE]continue_transport()",
+    "output_json": {
+      "payload": {
+	"__type__": "tensor",
+	"__value__": null
+      },
+      "method": "side_shift",
+      "__STATEMENT__": ""
+    }
+  },
+  {
+    "instruction": "A mobile manipulator detected excessive vibration while carrying a fragile laboratory sample.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport lab_transporter\n  - observe_payload() -> tensor : Observe payload dynamics.\n  - transport_sample() -> None : Transport the sample.\n  - estimate_vibration() -> tensor : Estimate vibration characteristics.\n  - activate_damping(model: tensor) -> tensor : Apply active damping.\n  - update_transport_model(loss: tensor) -> None : Improve transport stability.\n\nMinimize vibration rather than maximizing transport speed.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import lab_transporter\n[CODE]$payload = tensor observe_payload()\n[CODE]transport_sample()\n[EXCEPTION]VibrationException: Oscillation amplitude continued to increase during transport.\n[COMMENT]Reducing vibration is more important than maintaining schedule.\n[CODE]$model = tensor estimate_vibration()\n[CODE]$loss = tensor activate_damping($model)\n[CODE]update_transport_model($loss)",
+    "output_json": {
+      "payload": {
+	"__type__": "tensor",
+	"__value__": null
+      },
+      "model": {
 	"__type__": "tensor",
 	"__value__": null
       },
@@ -3650,466 +3469,368 @@
 	"__type__": "tensor",
 	"__value__": null
       },
-      "__STATEMENT__": "The robot adapted its braking strategy and safely continued driving.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "ロボットがスロープを登っている途中でタイヤが空転し始めました。xxGemma DSL を使用してください。最初に tensor と robot1 を import してください。利用可能な関数: robot1_scan() -> tensor (路面情報取得)、robot1_model(tensor) -> tensor (走行計画生成)、robot1_act(tensor) -> str (走行実行)、robot1_error_router_determine() -> str (回復方策決定)、robot1_slip_error_recovery() -> tensor (駆動回復動作生成)、robot1_error_router_reinforce(tensor) -> None (ルーター更新)、robot1_unhandlable_error() -> str (回復不能エラー)。登坂トラクション制御へ切り替え、安全に登坂してください。強化学習は不要です。",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$terrain = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($terrain)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Wheel slip detected.\n[COMMENT]Apply hill-climbing traction control to prevent rollback.\n[CODE]show robot1_error_router_determine()\n[RESULT]hill_climb\n[CODE]$recovery = tensor robot1_slip_error_recovery()\nロボットは登坂トラクション制御へ切り替え、安全に坂を登り切った。\n[CODE]return \"Recovered\"",
+    "instruction": "A hospital delivery robot accidentally dropped a medication container while navigating a corridor.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport medical_runner\n  - inspect_delivery_state() -> tensor : Inspect the delivery state.\n  - deliver_supplies() -> None : Deliver medical supplies.\n  - assess_spill_risk() -> bool : Assess whether spilled items present a hazard.\n  - isolate_area() -> None : Prevent people from entering the affected area.\n  - notify_staff() -> None : Notify nearby medical staff.\n\nIf the payload cannot be safely recovered by the robot, escalate the incident.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import medical_runner\n[CODE]$delivery = tensor inspect_delivery_state()\n[CODE]deliver_supplies()\n[EXCEPTION]PayloadException: A medication container fell onto the corridor floor.\n[COMMENT]Protect nearby people before attempting any recovery.\n[CODE]show assess_spill_risk()\n[RESULT]true\n[CODE]isolate_area()\n[CODE]notify_staff()\n[CODE]raise PayloadException: \"Manual recovery by hospital staff is required.\"",
     "output_json": {
-      "terrain": {
+      "delivery": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "plan": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "ロボットは登坂トラクション制御へ切り替え、安全に坂を登り切った。",
-      "__RETURN__": "Recovered"
-    }
-  },
-  {
-    "instruction": "An autonomous inspection robot left a paved road and entered loose gravel, causing unstable wheel traction. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures terrain information), robot1_model(tensor) -> tensor (generates a driving plan), robot1_act(tensor) -> str (executes the motion), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_slip_error_recovery() -> tensor (generates a terrain-adaptive driving action), robot1_error_router_reinforce(tensor) -> None (updates the router using a terrain adaptation loss tensor), robot1_unhandlable_error() -> str (reports a fatal error). Switch to four-wheel-drive terrain mode and reinforce the router using the measured traction error tensor.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$terrain = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($terrain)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Wheel slip detected.\n[COMMENT]Loose gravel requires four-wheel-drive terrain control together with router adaptation.\n[CODE]show robot1_error_router_determine()\n[RESULT]four_wheel_drive\n[CODE]$loss = tensor robot1_slip_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot enabled four-wheel-drive terrain mode and crossed the gravel safely.\n[CODE]return \"Recovered\"",
-    "output_json": {
-      "terrain": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "plan": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "loss": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot enabled four-wheel-drive terrain mode and crossed the gravel safely.",
-      "__RETURN__": "Recovered"
-    }
-  },
-  {
-    "instruction": "A mobile robot entered an icy warehouse entrance where the floor friction became extremely low. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures terrain information), robot1_model(tensor) -> tensor (builds a driving plan), robot1_act(tensor) -> str (executes motion), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_slip_error_recovery() -> tensor (generates a slip recovery action), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Shift the drivetrain into neutral, perform a micro-adjustment recovery, and continue without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$terrain = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($terrain)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Wheel slip detected.\n[COMMENT]Extremely low friction requires neutral mode followed by careful micro-adjustments.\n[CODE]show robot1_error_router_determine()\n[RESULT]neutral_recovery\n[CODE]$recovery = tensor robot1_slip_error_recovery()\nThe robot stabilized itself with fine adjustments and safely traversed the icy surface.\n[CODE]return \"Recovered\"",
-    "output_json": {
-      "terrain": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "plan": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot stabilized itself with fine adjustments and safely traversed the icy surface.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": "",
+      "__ERROR__": "PayloadException: Manual recovery by hospital staff is required."
     }
   },
 
   // PHYS-09: 物体仕分け時の認識曖昧性（Ambiguous Object）
   {
-    "instruction": "A sorting robot could not distinguish between an apple and a tomato because their appearance was too similar. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures image data), robot1_model(tensor) -> tensor (performs object recognition), robot1_act(tensor) -> str (executes the sorting action), robot1_error_router_determine() -> str (selects a recovery strategy), robot1_recognition_error_recovery() -> tensor (performs an additional recognition action), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Recover by rescanning the object from another viewpoint without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$image = tensor robot1_scan()\n[CODE]$object = tensor robot1_model($image)\n[CODE]robot1_act($object)\n[EXCEPTION]robot1_exception: Object recognition failed.\n[COMMENT]Capture the object from another viewpoint to improve recognition confidence.\n[CODE]show robot1_error_router_determine()\n[RESULT]multi_view\n[CODE]$recovery = tensor robot1_recognition_error_recovery()\nThe robot identified the object correctly after scanning it from another angle.\n[CODE]return \"Recovered\"",
+    "instruction": "A drone encountered strong crosswinds while flying through a mountain valley.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport valley_drone\n  - observe_flight_state() -> tensor : Observe the current flight state.\n  - inspect_route() -> None : Continue the planned route.\n  - reconstruct_airflow() -> tensor : Estimate the surrounding airflow.\n  - predict_safe_corridor(flow: tensor) -> tensor : Predict a safer flight corridor.\n  - redirect_flight(path: tensor) -> None : Follow the new flight path.\n  - cache_wind_model(flow: tensor) -> None : Cache the airflow estimate for future flights.\n\nRecover while minimizing unnecessary control oscillation.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import valley_drone\n[CODE]$flight = tensor observe_flight_state()\n[CODE]inspect_route()\n[EXCEPTION]FlightException: Crosswind gusts repeatedly pushed the aircraft away from its planned trajectory.\n[COMMENT]A stable detour is preferable to aggressive attitude corrections.\n[CODE]$flow = tensor reconstruct_airflow()\n[CODE]$path = tensor predict_safe_corridor($flow)\n[CODE]redirect_flight($path)\n[CODE]cache_wind_model($flow)",
     "output_json": {
-      "image": {
+      "flight": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "object": {
+      "flow": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "recovery": {
+      "path": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "__STATEMENT__": "The robot identified the object correctly after scanning it from another angle.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A recycling robot could not determine whether an object was trash or a valuable item based on vision alone. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures sensor information), robot1_model(tensor) -> tensor (classifies the object), robot1_act(tensor) -> str (executes the sorting action), robot1_error_router_determine() -> str (selects a recovery strategy), robot1_recognition_error_recovery() -> tensor (performs an additional sensing action), robot1_error_router_reinforce(tensor) -> None (updates the router using a recognition loss tensor), robot1_unhandlable_error() -> str (reports a fatal error). Use tactile sensing to resolve the ambiguity and reinforce the router using the classification error tensor.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$image = tensor robot1_scan()\n[CODE]$object = tensor robot1_model($image)\n[CODE]robot1_act($object)\n[EXCEPTION]robot1_exception: Object recognition failed.\n[COMMENT]Use tactile sensing to improve the classification result and adapt the router.\n[CODE]show robot1_error_router_determine()\n[RESULT]tactile_scan\n[CODE]$loss = tensor robot1_recognition_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot identified the object correctly using tactile sensing.\n[CODE]return \"Recovered\"",
+    "instruction": "A mobile manipulator detected an abnormal force pattern while opening a heavy industrial valve.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport valve_operator\n  - measure_joint_state() -> tensor : Observe joint motion.\n  - rotate_valve() -> None : Attempt to rotate the valve.\n  - capture_force_profile() -> tensor : Acquire the measured force profile.\n  - infer_binding(force: tensor) -> dict : Infer the likely cause of resistance.\n  - release_torque() -> None : Reduce applied torque.\n  - adjust_grasp(offset: float) -> None : Reposition the end effector.\n  - retry_rotation() -> None : Retry the valve operation.\n\nAvoid increasing torque before understanding the resistance.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import valve_operator\n[CODE]$joint = tensor measure_joint_state()\n[CODE]rotate_valve()\n[EXCEPTION]ManipulatorException: Resistance increased unexpectedly during valve rotation.\n[COMMENT]Additional force should never be the first recovery strategy.\n[CODE]$force = tensor capture_force_profile()\n[CODE]show infer_binding($force)\n[RESULT]{\"offset\":0.018,\"cause\":\"misalignment\"}\n[CODE]$analysis = dict $RESULT\n[CODE]release_torque()\n[CODE]adjust_grasp($analysis.offset)\n[CODE]retry_rotation()",
     "output_json": {
-      "image": {
+      "joint": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "object": {
+      "force": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "loss": {
-	"__type__": "tensor",
-	"__value__": null
+      "analysis": {
+	"offset": 0.018,
+	"cause": "misalignment"
       },
-      "__STATEMENT__": "The robot identified the object correctly using tactile sensing.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "部品箱の中で複数の部品が重なり合い、ロボットが個々の部品を識別できませんでした。xxGemma DSL を使用してください。最初に tensor と robot1 を import してください。利用可能な関数: robot1_scan() -> tensor (画像取得)、robot1_model(tensor) -> tensor (物体認識)、robot1_act(tensor) -> str (仕分け実行)、robot1_error_router_determine() -> str (回復方策決定)、robot1_recognition_error_recovery() -> tensor (追加認識処理)、robot1_error_router_reinforce(tensor) -> None (ルーター更新)、robot1_unhandlable_error() -> str (回復不能エラー)。部品を軽く動かして再認識してください。強化学習は不要です。",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$image = tensor robot1_scan()\n[CODE]$object = tensor robot1_model($image)\n[CODE]robot1_act($object)\n[EXCEPTION]robot1_exception: Object recognition failed.\n[COMMENT]Gently separate the overlapping parts before rescanning.\n[CODE]show robot1_error_router_determine()\n[RESULT]reposition\n[CODE]$recovery = tensor robot1_recognition_error_recovery()\nロボットは部品を軽く動かした後、正しく認識して仕分けを完了した。\n[CODE]return \"Recovered\"",
+    "instruction": "災害対応ロボットが煙のため距離センサーの信頼度低下を検知しました。\n\nimport tensor\n  - tensor <expr>: テンソルへ変換します。\n\nimport rescue_unit\n  - sample_environment() -> tensor : 周辺環境を観測\n  - search_survivors() -> None : 捜索を実行\n  - fuse_sensor_data() -> tensor : センサ情報を統合\n  - evaluate_confidence(data: tensor) -> float : 推定信頼度を評価\n  - enable_cautious_mode() -> None : 慎重走行へ切り替え\n  - synchronize_map(data: tensor) -> None : 地図情報を更新\n\n十分な信頼度が得られない場合は探索速度を優先しないでください。",
+    "dsl_program": "[CODE]import tensor\n[CODE]import rescue_unit\n[CODE]$environment = tensor sample_environment()\n[CODE]search_survivors()\n[EXCEPTION]SensorException: Dense smoke significantly reduced ranging reliability.\n[COMMENT]Reliable perception is more valuable than rapid exploration in hazardous environments.\n[CODE]$fusion = tensor fuse_sensor_data()\n[CODE]show evaluate_confidence($fusion)\n[RESULT]0.57\n[CODE]enable_cautious_mode()\n[CODE]synchronize_map($fusion)",
     "output_json": {
-      "image": {
+      "environment": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "object": {
+      "fusion": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "ロボットは部品を軽く動かした後、正しく認識して仕分けを完了した。",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A warehouse robot failed to read the barcode on a package because the label was dirty. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures image data), robot1_model(tensor) -> tensor (performs object recognition), robot1_act(tensor) -> str (executes the sorting action), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_recognition_error_recovery() -> tensor (performs an additional recognition action), robot1_error_router_reinforce(tensor) -> None (updates the router using a recognition loss tensor), robot1_unhandlable_error() -> str (reports a fatal error). Switch to OCR-based serial number recognition and reinforce the router using the recognition error tensor.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$image = tensor robot1_scan()\n[CODE]$object = tensor robot1_model($image)\n[CODE]robot1_act($object)\n[EXCEPTION]robot1_exception: Object recognition failed.\n[COMMENT]When the barcode cannot be read, switch to OCR-based serial number recognition.\n[CODE]show robot1_error_router_determine()\n[RESULT]ocr\n[CODE]$loss = tensor robot1_recognition_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot successfully identified the package using OCR and completed the sorting task.\n[CODE]return \"Recovered\"",
+    "instruction": "An autonomous harvesting robot found that ripe fruit was heavily occluded by branches.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport orchard_picker\n  - acquire_depth_map() -> tensor : Acquire a depth map.\n  - harvest() -> None : Harvest the target crop.\n  - reconstruct_canopy(depth: tensor) -> tensor : Reconstruct the surrounding branches.\n  - rank_grasp_candidates(model: tensor) -> list : Rank candidate grasp paths.\n  - execute_candidate(order: list) -> bool : Execute the preferred candidate.\n  - archive_failure_case() -> None : Record difficult harvesting situations.\n\nRecover by choosing a safer harvesting path instead of forcing access.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import orchard_picker\n[CODE]$depth = tensor acquire_depth_map()\n[CODE]harvest()\n[EXCEPTION]OcclusionException: Branches completely blocked the planned picking path.\n[COMMENT]Damaging the crop is worse than delaying a single harvest attempt.\n[CODE]$model = tensor reconstruct_canopy($depth)\n[CODE]show rank_grasp_candidates($model)\n[RESULT][\"upper_arc\",\"left_entry\",\"retry_later\"]\n[CODE]$order = list $RESULT\n[CODE]execute_candidate($order)\n[CODE]archive_failure_case()",
     "output_json": {
-      "image": {
+      "depth": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "object": {
+      "model": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "loss": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot successfully identified the package using OCR and completed the sorting task.",
-      "__RETURN__": "Recovered"
+      "order": [
+	"upper_arc",
+	"left_entry",
+	"retry_later"
+      ],
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A service robot encountered two visually identical medicine bottles with unreadable labels. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures image data), robot1_model(tensor) -> tensor (performs object recognition), robot1_act(tensor) -> str (executes the handling action), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_recognition_error_recovery() -> tensor (performs an additional recognition action), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Recover by reading the RFID tag instead of relying on vision. No reinforcement is required.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$image = tensor robot1_scan()\n[CODE]$object = tensor robot1_model($image)\n[CODE]robot1_act($object)\n[EXCEPTION]robot1_exception: Object recognition failed.\n[COMMENT]Use the RFID reader when visual identification is unreliable.\n[CODE]show robot1_error_router_determine()\n[RESULT]rfid\n[CODE]$recovery = tensor robot1_recognition_error_recovery()\nThe robot identified the correct medicine bottle using the RFID tag.\n[CODE]return \"Recovered\"",
+    "instruction": "An autonomous underwater robot experienced a sudden failure of its forward sonar while exploring a submerged tunnel.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport tunnel_explorer\n  - inspect_navigation_state() -> tensor : Observe the navigation state.\n  - explore_tunnel() -> None : Continue exploration.\n  - verify_backup_sensors() -> dict : Verify alternative sensing capabilities.\n  - retreat(distance: float) -> None : Move to a safer location.\n  - activate_backup_navigation() -> None : Enable redundant navigation.\n  - resume_exploration() -> None : Continue exploration.\n\nOnly continue the mission if redundant sensing is available.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import tunnel_explorer\n[CODE]$navigation = tensor inspect_navigation_state()\n[CODE]explore_tunnel()\n[EXCEPTION]SensorException: The forward sonar stopped providing valid range measurements.\n[COMMENT]Do not proceed into confined spaces without reliable obstacle perception.\n[CODE]show verify_backup_sensors()\n[RESULT]{\"available\":true,\"retreat\":2.5}\n[CODE]$backup = dict $RESULT\n[CODE]retreat($backup.retreat)\n[CODE]activate_backup_navigation()\n[CODE]resume_exploration()",
     "output_json": {
-      "image": {
+      "navigation": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "object": {
-	"__type__": "tensor",
-	"__value__": null
+      "backup": {
+	"available": true,
+	"retreat": 2.5
       },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot identified the correct medicine bottle using the RFID tag.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
 
   // PHYS-10: ロボットハンドの滑り落ち（Object Slipping）
   {
-    "instruction": "A robot detected that a thin glass beaker began slipping while being carried. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures tactile and vision data), robot1_model(tensor) -> tensor (generates a grasp plan), robot1_act(tensor) -> str (executes the grasp), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_grip_error_recovery() -> tensor (generates a grip recovery action), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Adapt the grip pressure using tactile feedback and reinforce the router using the slip loss tensor.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scan = tensor robot1_scan()\n[CODE]$grasp = tensor robot1_model($scan)\n[CODE]robot1_act($grasp)\n[EXCEPTION]robot1_exception: Grip slip detected.\n[COMMENT]Increase the grip pressure based on tactile feedback and adapt the router.\n[CODE]show robot1_error_router_determine()\n[RESULT]adaptive_grip\n[CODE]$loss = tensor robot1_grip_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot adjusted its grip pressure and safely carried the glass beaker.\n[CODE]return \"Recovered\"",
+    "instruction": "An autonomous mining robot detected excessive vibration from its drilling mechanism.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport mining_robot\n  - monitor_drill() -> tensor : Observe drill dynamics.\n  - drill_rock() -> None : Perform drilling.\n  - estimate_resonance() -> tensor : Estimate the resonance characteristics.\n  - retune_controller(model: tensor) -> None : Adjust the drilling controller.\n  - verify_stability() -> bool : Verify that vibration has stabilized.\n  - resume_drilling() -> None : Resume drilling.\n\nAvoid operating near resonant frequencies whenever possible.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import mining_robot\n[CODE]$drill = tensor monitor_drill()\n[CODE]drill_rock()\n[EXCEPTION]VibrationException: Oscillation amplitude increased toward a resonant condition.\n[COMMENT]Suppress resonance before attempting to improve drilling efficiency.\n[CODE]$model = tensor estimate_resonance()\n[CODE]retune_controller($model)\n[CODE]show verify_stability()\n[RESULT]true\n[CODE]resume_drilling()",
     "output_json": {
-      "scan": {
+      "drill": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "grasp": {
+      "model": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "loss": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot adjusted its grip pressure and safely carried the glass beaker.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A robot noticed that a cardboard box was slipping because its surface was smoother than expected. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures tactile information), robot1_model(tensor) -> tensor (generates a grasp plan), robot1_act(tensor) -> str (executes the grasp), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_grip_error_recovery() -> tensor (generates a grip recovery action), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Increase the grip torque immediately without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scan = tensor robot1_scan()\n[CODE]$grasp = tensor robot1_model($scan)\n[CODE]robot1_act($grasp)\n[EXCEPTION]robot1_exception: Grip slip detected.\n[COMMENT]Increase the grip torque immediately to prevent the box from slipping.\n[CODE]show robot1_error_router_determine()\n[RESULT]high_grip\n[CODE]$recovery = tensor robot1_grip_error_recovery()\nThe robot increased its grip torque and safely held the cardboard box.\n[CODE]return \"Recovered\"",
+    "instruction": "A humanoid robot experienced excessive joint torque while pushing open a heavy fire door.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport emergency_helper\n  - inspect_joint_load() -> tensor : Inspect joint loading.\n  - push_fire_door() -> None : Push the fire door.\n  - sample_force_distribution() -> tensor : Measure force distribution.\n  - redistribute_force(profile: tensor) -> tensor : Compute a safer force distribution.\n  - recalibrate_joints(profile: tensor) -> None : Recalibrate joint coordination.\n  - continue_operation() -> None : Resume the operation.\n\nPrevent joint overload even if the task takes longer.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import emergency_helper\n[CODE]$load = tensor inspect_joint_load()\n[CODE]push_fire_door()\n[EXCEPTION]JointLimitException: Shoulder torque approached the mechanical safety limit.\n[COMMENT]Reducing actuator stress is preferable to completing the motion quickly.\n[CODE]$force = tensor sample_force_distribution()\n[CODE]$profile = tensor redistribute_force($force)\n[CODE]recalibrate_joints($profile)\n[CODE]continue_operation()",
     "output_json": {
-      "scan": {
+      "load": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "grasp": {
+      "force": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "recovery": {
+      "profile": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "__STATEMENT__": "The robot increased its grip torque and safely held the cardboard box.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "ロボットが油圧シリンダーのシャフトを把持している途中で滑り始めました。xxGemma DSL を使用してください。最初に tensor と robot1 を import してください。利用可能な関数: robot1_scan() -> tensor (触覚・力覚取得)、robot1_model(tensor) -> tensor (把持計画生成)、robot1_act(tensor) -> str (把持実行)、robot1_error_router_determine() -> str (回復方策決定)、robot1_grip_error_recovery() -> tensor (把持回復動作生成)、robot1_error_router_reinforce(tensor) -> None (ルーター更新)、robot1_unhandlable_error() -> str (回復不能エラー)。せん断応力の変化を利用して把持を補正し、誤差テンソルでルーターを学習してください。",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scan = tensor robot1_scan()\n[CODE]$grasp = tensor robot1_model($scan)\n[CODE]robot1_act($grasp)\n[EXCEPTION]robot1_exception: Grip slip detected.\n[COMMENT]Use the measured shear stress to adapt the grasp force and reinforce the router.\n[CODE]show robot1_error_router_determine()\n[RESULT]shear_control\n[CODE]$loss = tensor robot1_grip_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nロボットは把持力を補正し、シャフトを安全に保持し続けた。\n[CODE]return \"Recovered\"",
+    "instruction": "倉庫ロボットが通路の床面に大きな段差を検知しました。\n\nimport tensor\n  - tensor <expr>: テンソルへ変換します。\n\nimport logistics_runner\n  - capture_depth_map() -> tensor : 深度マップを取得\n  - deliver_container() -> None : コンテナを搬送\n  - reconstruct_surface(depth: tensor) -> tensor : 路面形状を復元\n  - score_routes(surface: tensor) -> list : 通行候補を評価\n  - switch_route(candidates: list) -> None : 経路を変更\n  - update_navigation_cache(surface: tensor) -> None : 地形情報を保存\n\n危険な段差を越えるより安全な迂回を優先してください。",
+    "dsl_program": "[CODE]import tensor\n[CODE]import logistics_runner\n[CODE]$depth = tensor capture_depth_map()\n[CODE]deliver_container()\n[EXCEPTION]NavigationException: A floor height change exceeded the vehicle's clearance.\n[COMMENT]Prefer a predictable detour instead of challenging uncertain terrain.\n[CODE]$surface = tensor reconstruct_surface($depth)\n[CODE]show score_routes($surface)\n[RESULT][\"north_corridor\",\"service_lane\"]\n[CODE]$routes = list $RESULT\n[CODE]switch_route($routes)\n[CODE]update_navigation_cache($surface)",
     "output_json": {
-      "scan": {
+      "depth": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "grasp": {
+      "surface": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "loss": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "ロボットは把持力を補正し、シャフトを安全に保持し続けた。",
-      "__RETURN__": "Recovered"
+      "routes": [
+	"north_corridor",
+	"service_lane"
+      ],
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A robot completely lost its grip on a fragile ceramic cup, and the cup began falling toward the floor. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures tactile and vision data), robot1_model(tensor) -> tensor (generates a recovery plan), robot1_act(tensor) -> str (executes the motion), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_grip_error_recovery() -> tensor (generates an emergency recovery action), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Move the manipulator to a safe avoidance posture before the object reaches the floor. No reinforcement is required.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scan = tensor robot1_scan()\n[CODE]$grasp = tensor robot1_model($scan)\n[CODE]robot1_act($grasp)\n[EXCEPTION]robot1_exception: Grip slip detected.\n[COMMENT]The object cannot be recovered safely, so immediately move to an avoidance posture.\n[CODE]show robot1_error_router_determine()\n[RESULT]safe_retreat\n[CODE]$recovery = tensor robot1_grip_error_recovery()\nThe robot moved to a safe posture before the falling cup reached the floor.\n[CODE]return \"Recovered\"",
+    "instruction": "An aerial inspection drone temporarily lost GNSS reception while flying between high-rise buildings.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport city_drone\n  - inspect_navigation() -> tensor : Observe navigation status.\n  - inspect_bridge() -> None : Inspect the assigned bridge.\n  - estimate_localization() -> dict : Evaluate localization reliability.\n  - enable_visual_odometry() -> None : Switch to visual odometry.\n  - synchronize_local_map() -> None : Synchronize the local map.\n\nContinue only if localization remains sufficiently reliable.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import city_drone\n[CODE]$navigation = tensor inspect_navigation()\n[CODE]inspect_bridge()\n[EXCEPTION]LocalizationException: Satellite positioning became unavailable inside the urban canyon.\n[COMMENT]Maintaining reliable localization is more important than following the original flight schedule.\n[CODE]show estimate_localization()\n[RESULT]{\"confidence\":0.91,\"visual_odometry\":true}\n[CODE]$status = dict $RESULT\n[CODE]enable_visual_odometry()\n[CODE]synchronize_local_map()",
     "output_json": {
-      "scan": {
+      "navigation": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "grasp": {
-	"__type__": "tensor",
-	"__value__": null
+      "status": {
+	"confidence": 0.91,
+	"visual_odometry": true
       },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot moved to a safe posture before the falling cup reached the floor.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "A robot was carrying a thin plastic bag whose handle began stretching toward its tearing limit. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures tactile information), robot1_model(tensor) -> tensor (generates a grasp plan), robot1_act(tensor) -> str (executes the grasp), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_grip_error_recovery() -> tensor (generates a grip recovery action), robot1_error_router_reinforce(tensor) -> None (updates the router using a tearing-force loss tensor), robot1_unhandlable_error() -> str (reports a fatal error). Reduce the pulling force and reinforce the router using the measured tearing-force error tensor.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scan = tensor robot1_scan()\n[CODE]$grasp = tensor robot1_model($scan)\n[CODE]robot1_act($grasp)\n[EXCEPTION]robot1_exception: Grip slip detected.\n[COMMENT]Reduce the pulling force to avoid tearing the plastic bag and adapt the router.\n[CODE]show robot1_error_router_determine()\n[RESULT]tear_protection\n[CODE]$loss = tensor robot1_grip_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot reduced the pulling force and transported the plastic bag without tearing it.\n[CODE]return \"Recovered\"",
+    "instruction": "An autonomous firefighting robot detected structural collapse risk while operating inside a damaged building.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport fire_response\n  - observe_structure() -> tensor : Observe the surrounding structure.\n  - extinguish_fire() -> None : Perform firefighting.\n  - predict_collapse() -> dict : Predict structural stability.\n  - withdraw(distance: float) -> None : Move to a safer position.\n  - transmit_hazard_report(report: dict) -> None : Report the detected hazard.\n\nIf the environment is no longer safe for autonomous operation, terminate the mission.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import fire_response\n[CODE]$structure = tensor observe_structure()\n[CODE]extinguish_fire()\n[EXCEPTION]HazardException: Structural deformation accelerated beyond the safety threshold.\n[COMMENT]Protecting the robot preserves future rescue capability.\n[CODE]show predict_collapse()\n[RESULT]{\"evacuate\":true,\"distance\":12.0}\n[CODE]$hazard = dict $RESULT\n[CODE]withdraw($hazard.distance)\n[CODE]transmit_hazard_report($hazard)\n[CODE]raise HazardException: \"Autonomous firefighting suspended due to collapse risk.\"",
     "output_json": {
-      "scan": {
+      "structure": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "grasp": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "loss": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot reduced the pulling force and transported the plastic bag without tearing it.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": "",
+      "__ERROR__": "HazardException: Autonomous firefighting suspended due to collapse risk."
     }
   },
 
   // PHYS-11: 環境の急激な変化（強風・振動・地震など、不可避な場合はraise）
   {
-    "instruction": "A cargo drone encountered a strong crosswind while transporting a package outdoors. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures environmental sensor data), robot1_model(tensor) -> tensor (generates a flight control plan), robot1_act(tensor) -> str (executes the flight command), robot1_error_router_determine() -> str (selects a recovery strategy), robot1_environment_error_recovery() -> tensor (generates a stabilized control action), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Tilt into the wind, reduce speed, and continue the flight without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$env = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($env)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Strong wind detected.\n[COMMENT]Compensate for the crosswind by tilting into the wind and reducing flight speed.\n[CODE]show robot1_error_router_determine()\n[RESULT]wind_compensation\n[CODE]$recovery = tensor robot1_environment_error_recovery()\nThe robot compensated for the wind and continued the delivery safely.\n[CODE]return \"Recovered\"",
+    "instruction": "An autonomous inspection robot lost communication with its remote supervisor while operating inside an underground utility tunnel.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport tunnel_inspector\n  - inspect_system_state() -> tensor : Observe the current system state.\n  - inspect_tunnel() -> None : Continue tunnel inspection.\n  - estimate_link_quality() -> dict : Evaluate communication quality.\n  - navigate_to_relay(point: str) -> None : Move toward a relay location.\n  - verify_connection() -> bool : Verify communication recovery.\n  - resume_inspection() -> None : Resume inspection.\n\nMaintain a recoverable communication path whenever possible.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import tunnel_inspector\n[CODE]$system = tensor inspect_system_state()\n[CODE]inspect_tunnel()\n[EXCEPTION]CommunicationException: Telemetry packets were no longer acknowledged by the control station.\n[COMMENT]Recovering communication takes priority over collecting additional inspection data.\n[CODE]show estimate_link_quality()\n[RESULT]{\"relay\":\"junction_4\",\"signal\":0.18}\n[CODE]$link = dict $RESULT\n[CODE]navigate_to_relay($link.relay)\n[CODE]show verify_connection()\n[RESULT]true\n[CODE]resume_inspection()",
     "output_json": {
-      "env": {
+      "system": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "plan": {
-	"__type__": "tensor",
-	"__value__": null
+      "link": {
+	"relay": "junction_4",
+	"signal": 0.18
       },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot compensated for the wind and continued the delivery safely.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "An indoor service robot detected severe floor vibration caused by nearby construction work. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures environmental sensor data), robot1_model(tensor) -> tensor (generates a motion plan), robot1_act(tensor) -> str (executes the motion), robot1_error_router_determine() -> str (selects a recovery strategy), robot1_environment_error_recovery() -> tensor (generates a stabilized control action), robot1_error_router_reinforce(tensor) -> None (updates the router using a vibration loss tensor), robot1_unhandlable_error() -> str (reports a fatal error). Adapt the posture controller and reinforce the router using the measured vibration spectrum error tensor.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$env = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($env)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Excessive vibration detected.\n[COMMENT]Adapt the posture controller to suppress vibration and reinforce the router.\n[CODE]show robot1_error_router_determine()\n[RESULT]vibration_control\n[CODE]$loss = tensor robot1_environment_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot stabilized its posture and safely continued operating despite the vibration.\n[CODE]return \"Recovered\"",
+    "instruction": "A warehouse sorting robot found that its barcode scanner produced inconsistent readings.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport sorting_unit\n  - capture_scan_frame() -> tensor : Capture scanner data.\n  - sort_package() -> None : Sort a package.\n  - extract_features() -> tensor : Extract barcode features.\n  - score_decoder(features: tensor) -> dict : Evaluate available decoding methods.\n  - switch_decoder(name: str) -> None : Activate another decoder.\n  - append_quality_log(report: dict) -> None : Record scanner quality information.\n\nChoose the most reliable decoding strategy instead of repeating failed scans.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import sorting_unit\n[CODE]$frame = tensor capture_scan_frame()\n[CODE]sort_package()\n[EXCEPTION]VisionException: Consecutive barcode reads produced conflicting identifiers.\n[COMMENT]Improving decoding reliability is preferable to repeatedly scanning the same label.\n[CODE]$features = tensor extract_features()\n[CODE]show score_decoder($features)\n[RESULT]{\"decoder\":\"adaptive\",\"confidence\":0.94}\n[CODE]$selection = dict $RESULT\n[CODE]switch_decoder($selection.decoder)\n[CODE]append_quality_log($selection)",
     "output_json": {
-      "env": {
+      "frame": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "plan": {
+      "features": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "loss": {
-	"__type__": "tensor",
-	"__value__": null
+      "selection": {
+	"decoder": "adaptive",
+	"confidence": 0.94
       },
-      "__STATEMENT__": "The robot stabilized its posture and safely continued operating despite the vibration.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "屋外巡回ロボットが豪雨を検知し、防水性能の安全限界に近づきました。xxGemma DSL を使用してください。最初に tensor と robot1 を import してください。利用可能な関数: robot1_scan() -> tensor (環境情報取得)、robot1_model(tensor) -> tensor (行動計画生成)、robot1_act(tensor) -> str (行動実行)、robot1_error_router_determine() -> str (回復方策決定)、robot1_environment_error_recovery() -> tensor (退避動作生成)、robot1_error_router_reinforce(tensor) -> None (ルーター更新)、robot1_unhandlable_error() -> str (回復不能エラー)。最寄りのシェルターへ退避してください。強化学習は不要です。",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$env = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($env)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Heavy rain detected.\n[COMMENT]Move to the nearest shelter before the waterproof limit is exceeded.\n[CODE]show robot1_error_router_determine()\n[RESULT]shelter\n[CODE]$recovery = tensor robot1_environment_error_recovery()\nロボットは最寄りのシェルターへ退避し、安全な状態を維持した。\n[CODE]return \"Recovered\"",
+    "instruction": "物流ロボットがエレベーターの到着予定時刻を大幅に超えて待機しています。\n\nimport tensor\n  - tensor <expr>: テンソルへ変換します。\n\nimport logistics_helper\n  - observe_schedule() -> tensor : スケジュール状態を取得\n  - transport_item() -> None : 荷物を搬送\n  - predict_delay() -> dict : 待ち時間を予測\n  - evaluate_alternative_routes(report: dict) -> list : 代替経路を評価\n  - follow_route(route: str) -> None : 新しい経路へ移動\n  - remember_delay(report: dict) -> None : 遅延情報を記録\n\n待機時間が長い場合は別経路を優先してください。",
+    "dsl_program": "[CODE]import tensor\n[CODE]import logistics_helper\n[CODE]$schedule = tensor observe_schedule()\n[CODE]transport_item()\n[EXCEPTION]SchedulingException: Elevator service was delayed beyond the expected operating window.\n[COMMENT]Long waits reduce fleet efficiency more than taking a modest detour.\n[CODE]show predict_delay()\n[RESULT]{\"minutes\":8,\"reason\":\"maintenance\"}\n[CODE]$delay = dict $RESULT\n[CODE]show evaluate_alternative_routes($delay)\n[RESULT][\"west_ramp\",\"north_lift\"]\n[CODE]$routes = list $RESULT\n[CODE]follow_route(\"west_ramp\")\n[CODE]remember_delay($delay)",
     "output_json": {
-      "env": {
+      "schedule": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "plan": {
-	"__type__": "tensor",
-	"__value__": null
+      "delay": {
+	"minutes": 8,
+	"reason": "maintenance"
       },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "ロボットは最寄りのシェルターへ退避し、安全な状態を維持した。",
-      "__RETURN__": "Recovered"
+      "routes": [
+	"west_ramp",
+	"north_lift"
+      ],
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "An outdoor inspection robot was struck by a sudden gust that overturned the vehicle, making self-recovery physically impossible. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures environmental and posture data), robot1_model(tensor) -> tensor (generates an action plan), robot1_act(tensor) -> str (executes the action), robot1_error_router_determine() -> str (selects a recovery strategy), robot1_environment_error_recovery() -> tensor (generates a recovery action), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal fault). Detect that recovery is impossible and raise the error \"Overturned. Hardware damage critical.\".",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$env = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($env)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Vehicle overturned.\n[COMMENT]The robot cannot recover because the hardware has overturned.\n[CODE]show robot1_unhandlable_error()\n[RESULT]Error: \"Overturned. Hardware damage critical.\"\n[CODE]raise Error: \"Overturned. Hardware damage critical.\"",
+    "instruction": "An agricultural robot detected inconsistent localization after crossing a narrow bridge between fields.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport field_navigator\n  - inspect_pose() -> tensor : Observe the current pose estimate.\n  - navigate_field() -> None : Navigate through the field.\n  - fuse_localization() -> tensor : Fuse multiple localization sources.\n  - compute_pose_covariance(model: tensor) -> tensor : Estimate localization uncertainty.\n  - recalibrate_localization(stats: tensor) -> None : Recalibrate localization.\n  - persist_calibration() -> None : Save calibration data.\n\nReduce localization uncertainty before continuing autonomous travel.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import field_navigator\n[CODE]$pose = tensor inspect_pose()\n[CODE]navigate_field()\n[EXCEPTION]LocalizationException: Position estimates diverged after crossing uneven terrain.\n[COMMENT]Reliable localization is essential before autonomous navigation resumes.\n[CODE]$fusion = tensor fuse_localization()\n[CODE]$covariance = tensor compute_pose_covariance($fusion)\n[CODE]recalibrate_localization($covariance)\n[CODE]persist_calibration()",
     "output_json": {
-      "env": {
+      "pose": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "plan": {
+      "fusion": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "__ERROR__": "Error: \"Overturned. Hardware damage critical.\""
+      "covariance": {
+	"__type__": "tensor",
+	"__value__": null
+      },
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "An outdoor mobile robot detected flooding caused by torrential rain, and the water level rose above the maximum hardware protection limit. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures environmental data), robot1_model(tensor) -> tensor (generates an action plan), robot1_act(tensor) -> str (executes the action), robot1_error_router_determine() -> str (selects a recovery strategy), robot1_environment_error_recovery() -> tensor (generates a recovery action), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal fault). Deploy the emergency waterproof cover and retreat to higher ground without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$env = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($env)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Flood risk detected.\n[COMMENT]Deploy the emergency waterproof cover and retreat to higher ground before water reaches critical components.\n[CODE]show robot1_error_router_determine()\n[RESULT]flood_retreat\n[CODE]$recovery = tensor robot1_environment_error_recovery()\nThe robot deployed its waterproof cover and safely retreated to higher ground.\n[CODE]return \"Recovered\"",
+    "instruction": "A disaster response robot entered an area where airborne dust completely blocked its perception systems.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport disaster_responder\n  - monitor_environment() -> tensor : Observe the surrounding environment.\n  - search_area() -> None : Search the assigned area.\n  - assess_visibility() -> dict : Assess perception capability.\n  - retreat_to_clear_zone() -> None : Return to a location with better visibility.\n  - broadcast_status(report: dict) -> None : Report the current operating status.\n\nTerminate autonomous exploration if safe perception cannot be restored.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import disaster_responder\n[CODE]$environment = tensor monitor_environment()\n[CODE]search_area()\n[EXCEPTION]PerceptionException: Airborne dust completely obscured the robot's sensing range.\n[COMMENT]Continuing without dependable perception would unnecessarily increase operational risk.\n[CODE]show assess_visibility()\n[RESULT]{\"recoverable\":false,\"visibility\":0.03}\n[CODE]$status = dict $RESULT\n[CODE]retreat_to_clear_zone()\n[CODE]broadcast_status($status)\n[CODE]raise PerceptionException: \"Autonomous exploration suspended until visibility improves.\"",
     "output_json": {
-      "env": {
+      "environment": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "plan": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robot deployed its waterproof cover and safely retreated to higher ground.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": "",
+      "__ERROR__": "PerceptionException: Autonomous exploration suspended until visibility improves."
     }
   },
 
   // PHYS-12: 複数協調作業時の他ロボットのトラブル検知（通信・物理不可避時はraise）
   {
-    "instruction": "Two robots were carrying a large cabinet together when the partner robot suddenly locked its wheels. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures cooperative task status), robot1_model(tensor) -> tensor (generates a cooperative motion plan), robot1_act(tensor) -> str (executes the cooperative motion), robot1_error_router_determine() -> str (selects a recovery strategy), robot1_cooperation_error_recovery() -> tensor (generates a synchronized recovery motion), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Synchronize with the stopped partner and perform an emergency stop without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$coop = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($coop)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Partner wheel locked.\n[COMMENT]Synchronize with the stopped partner and prevent dragging the shared load.\n[CODE]show robot1_error_router_determine()\n[RESULT]sync_stop\n[CODE]$recovery = tensor robot1_cooperation_error_recovery()\nThe robot synchronized with its partner and safely stopped while supporting the load.\n[CODE]return \"Recovered\"",
+    "instruction": "A multi-robot construction team detected that a bridge inspection robot had become immobilized on a temporary platform.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport bridge_team\n  - inspect_team_state() -> tensor : Observe the current team state.\n  - inspect_bridge() -> None : Continue the inspection mission.\n  - secure_worksite() -> None : Prevent nearby robots from entering the hazardous area.\n  - reconstruct_scene() -> tensor : Reconstruct the surrounding environment.\n  - assign_assistance(scene: tensor) -> dict : Select an assisting robot.\n  - dispatch_assistance(robot: str) -> None : Dispatch the assisting robot.\n\nPrioritize team safety before attempting recovery.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import bridge_team\n[CODE]$team = tensor inspect_team_state()\n[CODE]inspect_bridge()\n[EXCEPTION]MobilityException: One inspection unit became immobilized near an unstable platform edge.\n[COMMENT]Protect nearby robots before coordinating any recovery effort.\n[CODE]secure_worksite()\n[CODE]$scene = tensor reconstruct_scene()\n[CODE]show assign_assistance($scene)\n[RESULT]{\"robot\":\"crane_unit_2\",\"eta\":35}\n[CODE]$assignment = dict $RESULT\n[CODE]dispatch_assistance($assignment.robot)",
     "output_json": {
-      "coop": {
+      "team": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "plan": {
+      "scene": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "recovery": {
-	"__type__": "tensor",
-	"__value__": null
+      "assignment": {
+	"robot": "crane_unit_2",
+	"eta": 35
       },
-      "__STATEMENT__": "The robot synchronized with its partner and safely stopped while supporting the load.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "Two warehouse robots were carrying a heavy pallet together when communication with the partner robot was suddenly lost. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures cooperative task status), robot1_model(tensor) -> tensor (generates a cooperative motion plan), robot1_act(tensor) -> str (executes the cooperative motion), robot1_error_router_determine() -> str (selects a recovery strategy), robot1_cooperation_error_recovery() -> tensor (generates a recovery action), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Safely place the pallet on the floor and raise the error \"Peer communication lost. Aborting task.\" because cooperation can no longer continue.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$coop = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($coop)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Peer communication lost.\n[COMMENT]Safely lower the shared load before aborting the cooperative task.\n[CODE]show robot1_unhandlable_error()\n[RESULT]Error: \"Peer communication lost. Aborting task.\"\n[CODE]raise Error: \"Peer communication lost. Aborting task.\"",
+    "instruction": "A surgical assistant robot detected inconsistent force feedback while inserting a medical instrument.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport surgical_assistant\n  - capture_force_field() -> tensor : Capture the current force field.\n  - insert_instrument() -> None : Insert the instrument.\n  - freeze_motion() -> None : Immediately stop instrument motion.\n  - segment_force_pattern(field: tensor) -> tensor : Segment abnormal force regions.\n  - compare_reference(model: tensor) -> bool : Compare against the expected force pattern.\n  - withdraw_instrument() -> None : Withdraw the instrument safely.\n\nImmediately stop motion whenever tissue interaction becomes uncertain.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import surgical_assistant\n[CODE]$force = tensor capture_force_field()\n[CODE]insert_instrument()\n[EXCEPTION]ForceFeedbackException: Instrument interaction no longer matched the expected tissue response.\n[COMMENT]Patient safety always outweighs task completion.\n[CODE]freeze_motion()\n[CODE]$model = tensor segment_force_pattern($force)\n[CODE]show compare_reference($model)\n[RESULT]false\n[CODE]withdraw_instrument()\n[CODE]raise ForceFeedbackException: \"Procedure halted for manual evaluation.\"",
     "output_json": {
-      "coop": {
+      "force": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "plan": {
+      "model": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "__ERROR__": "Error: \"Peer communication lost. Aborting task.\""
+      "__STATEMENT__": "",
+      "__STATEMENT__": "ForceFeedbackException: Procedure halted for manual evaluation."
     }
   },
   {
-    "instruction": "大型部品を2台のロボットで運搬中、相手ロボットのアーム出力が低下しました。xxGemma DSL を使用してください。最初に tensor と robot1 を import してください。利用可能な関数: robot1_scan() -> tensor (協調状態取得)、robot1_model(tensor) -> tensor (協調動作生成)、robot1_act(tensor) -> str (協調動作実行)、robot1_error_router_determine() -> str (回復方策決定)、robot1_cooperation_error_recovery() -> tensor (協調回復動作生成)、robot1_error_router_reinforce(tensor) -> None (ルーター更新)、robot1_unhandlable_error() -> str (回復不能エラー)。自機のアーム出力を一時的に高めて荷重を肩代わりしてください。強化学習は不要です。",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$coop = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($coop)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Partner arm output degraded.\n[COMMENT]Temporarily increase the local arm output to compensate for the partner robot.\n[CODE]show robot1_error_router_determine()\n[RESULT]load_share\n[CODE]$recovery = tensor robot1_cooperation_error_recovery()\nロボットは一時的に荷重を肩代わりし、協調搬送を継続した。\n[CODE]return \"Recovered\"",
+    "instruction": "宇宙探査ローバーが岩陰に入ったことで地球との通信が断続的になりました。\n\nimport tensor\n  - tensor <expr>: テンソルへ変換します。\n\nimport mars_rover\n  - sample_navigation_state() -> tensor : 移動状態を取得\n  - explore_region() -> None : 探査を継続\n  - triangulate_relay() -> tensor : 通信可能な方向を推定\n  - project_escape_path(model: tensor) -> tensor : 通信回復経路を生成\n  - follow_escape_path(path: tensor) -> None : 経路を実行\n  - preserve_science_data() -> None : 観測データを保存\n\n通信回復を優先し、観測データを失わないようにしてください。",
+    "dsl_program": "[CODE]import tensor\n[CODE]import mars_rover\n[CODE]$navigation = tensor sample_navigation_state()\n[CODE]explore_region()\n[EXCEPTION]CommunicationException: Terrain intermittently blocked the communication link.\n[COMMENT]Avoid collecting additional samples until communication becomes reliable again.\n[CODE]$relay = tensor triangulate_relay()\n[CODE]$path = tensor project_escape_path($relay)\n[CODE]preserve_science_data()\n[CODE]follow_escape_path($path)",
     "output_json": {
-      "coop": {
+      "navigation": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "plan": {
+      "relay": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "recovery": {
+      "path": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "__STATEMENT__": "ロボットは一時的に荷重を肩代わりし、協調搬送を継続した。",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "Two autonomous robots were transporting a long steel beam together when the partner robot reported a critically low battery. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures cooperative task status), robot1_model(tensor) -> tensor (generates a cooperative motion plan), robot1_act(tensor) -> str (executes the cooperative motion), robot1_error_router_determine() -> str (selects a recovery strategy), robot1_cooperation_error_recovery() -> tensor (generates a coordinated recovery action), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Safely lower the shared load to the floor and initiate the partner support procedure without reinforcement.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$coop = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($coop)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Partner battery low.\n[COMMENT]Lower the shared load safely before assisting the partner robot.\n[CODE]show robot1_error_router_determine()\n[RESULT]safe_lower\n[CODE]$recovery = tensor robot1_cooperation_error_recovery()\nThe robots safely lowered the load and initiated the partner support procedure.\n[CODE]return \"Recovered\"",
+    "instruction": "An autonomous underwater maintenance robot encountered a fast-moving debris cloud that invalidated its navigation map.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport subsea_maintenance\n  - inspect_vehicle_state() -> tensor : Observe the vehicle state.\n  - inspect_pipeline() -> None : Continue pipeline inspection.\n  - acquire_sonar_cloud() -> tensor : Acquire a sonar point cloud.\n  - filter_dynamic_objects(cloud: tensor) -> tensor : Remove moving objects from the observation.\n  - rebuild_cost_map(model: tensor) -> tensor : Construct a new navigation cost map.\n  - retreat_to_checkpoint(map: tensor) -> None : Return to the nearest safe checkpoint.\n\nDiscard obsolete environmental assumptions before planning a recovery path.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import subsea_maintenance\n[CODE]$vehicle = tensor inspect_vehicle_state()\n[CODE]inspect_pipeline()\n[EXCEPTION]NavigationException: Suspended debris invalidated the previously mapped free space.\n[COMMENT]Planning with outdated environmental information may create additional hazards.\n[CODE]$cloud = tensor acquire_sonar_cloud()\n[CODE]$filtered = tensor filter_dynamic_objects($cloud)\n[CODE]$cost = tensor rebuild_cost_map($filtered)\n[CODE]retreat_to_checkpoint($cost)",
     "output_json": {
-      "coop": {
+      "vehicle": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "plan": {
+      "cloud": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "recovery": {
+      "filtered": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "__STATEMENT__": "The robots safely lowered the load and initiated the partner support procedure.",
-      "__RETURN__": "Recovered"
+      "cost": {
+	"__type__": "tensor",
+	"__value__": null
+      },
+      "__STATEMENT__": ""
     }
   },
   {
-    "instruction": "Two cooperative robots carrying a precision instrument detected that their motion synchronization drifted by several milliseconds. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures cooperative synchronization status), robot1_model(tensor) -> tensor (generates a cooperative control plan), robot1_act(tensor) -> str (executes the cooperative motion), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_cooperation_error_recovery() -> tensor (generates a synchronization recovery action), robot1_error_router_reinforce(tensor) -> None (updates the router using a synchronization error tensor), robot1_unhandlable_error() -> str (reports a fatal error). Reset the synchronization timing and reinforce the router using the measured synchronization error tensor.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$coop = tensor robot1_scan()\n[CODE]$plan = tensor robot1_model($coop)\n[CODE]robot1_act($plan)\n[EXCEPTION]robot1_exception: Synchronization drift detected.\n[COMMENT]Reset the synchronization timing and adapt the router using the synchronization error.\n[CODE]show robot1_error_router_determine()\n[RESULT]sync_reset\n[CODE]$loss = tensor robot1_cooperation_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robots restored synchronized motion and safely continued carrying the precision instrument.\n[CODE]return \"Recovered\"",
+    "instruction": "An autonomous firefighting robot detected multiple simultaneous hardware failures after a partial ceiling collapse.\n\nimport tensor\n  - tensor <expr>: convert data into a tensor.\n\nimport emergency_unit\n  - monitor_system_health() -> tensor : Observe system health.\n  - suppress_fire() -> None : Continue fire suppression.\n  - diagnose_failures() -> dict : Summarize the detected failures.\n  - transmit_emergency_report(report: dict) -> None : Notify the command center.\n  - enter_safe_shutdown() -> None : Transition to a protected shutdown state.\n\nIf the robot can no longer operate safely, preserve diagnostic information and terminate autonomous operation.",
+    "dsl_program": "[CODE]import tensor\n[CODE]import emergency_unit\n[CODE]$health = tensor monitor_system_health()\n[CODE]suppress_fire()\n[EXCEPTION]SystemFailureException: Multiple critical subsystems became unavailable after structural impact.\n[COMMENT]Attempting further autonomous action would increase the likelihood of permanent system loss.\n[CODE]show diagnose_failures()\n[RESULT]{\"mobility\":\"offline\",\"cooling\":\"offline\",\"communications\":\"degraded\"}\n[CODE]$report = dict $RESULT\n[CODE]transmit_emergency_report($report)\n[CODE]enter_safe_shutdown()\n[CODE]raise SystemFailureException: \"Robot shut down after unrecoverable hardware failure.\"",
     "output_json": {
-      "coop": {
+      "health": {
 	"__type__": "tensor",
 	"__value__": null
       },
-      "plan": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "loss": {
-	"__type__": "tensor",
-	"__value__": null
-      },
-      "__STATEMENT__": "The robots restored synchronized motion and safely continued carrying the precision instrument.",
-      "__RETURN__": "Recovered"
+      "__STATEMENT__": "",
+      "__ERROR__": "SystemFailureException: Robot shut down after unrecoverable hardware failure."
     }
   }
 ]
