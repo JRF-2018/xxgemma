@@ -1,5 +1,5 @@
 // xxgemma_sft_dataset.jsonc
-// Version 0.0.1 (Time-stamp: <2026-07-10T09:11:09Z>)
+// Version 0.0.1 (Time-stamp: <2026-07-10T09:26:34Z>)
 //
 // xxLLM (JSON を出力する xLLM に対し、JSON を出力するプログラムを出力
 // する LLM) を Gemma のファインチューニングで実装する。そのプロジェク
@@ -3820,7 +3820,7 @@
   // PHYS-10: ロボットハンドの滑り落ち（Object Slipping）
   {
     "instruction": "A robot detected that a thin glass beaker began slipping while being carried. Use the xxGemma DSL. First import tensor and robot1. Available functions: robot1_scan() -> tensor (captures tactile and vision data), robot1_model(tensor) -> tensor (generates a grasp plan), robot1_act(tensor) -> str (executes the grasp), robot1_error_router_determine() -> str (selects the recovery strategy), robot1_grip_error_recovery() -> tensor (generates a grip recovery action), robot1_error_router_reinforce(tensor) -> None (updates the router), robot1_unhandlable_error() -> str (reports a fatal error). Adapt the grip pressure using tactile feedback and reinforce the router using the slip loss tensor.",
-    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scan = tensor robot1_scan()\n[CODE]$grasp = tensor robot1_model($scan)\n[CODE]robot1_act($grasp)\n[RESULT]success\n[EXCEPTION]robot1_exception: Grip slip detected.\n[COMMENT]Increase the grip pressure based on tactile feedback and adapt the router.\n[CODE]show robot1_error_router_determine()\n[RESULT]adaptive_grip\n[CODE]$loss = tensor robot1_grip_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot adjusted its grip pressure and safely carried the glass beaker.\n[CODE]return \"Recovered\"",
+    "dsl_program": "[CODE]import tensor\n[CODE]import robot1\n[CODE]$scan = tensor robot1_scan()\n[CODE]$grasp = tensor robot1_model($scan)\n[CODE]robot1_act($grasp)\n[EXCEPTION]robot1_exception: Grip slip detected.\n[COMMENT]Increase the grip pressure based on tactile feedback and adapt the router.\n[CODE]show robot1_error_router_determine()\n[RESULT]adaptive_grip\n[CODE]$loss = tensor robot1_grip_error_recovery()\n[CODE]robot1_error_router_reinforce($loss)\n[RESULT]None\nThe robot adjusted its grip pressure and safely carried the glass beaker.\n[CODE]return \"Recovered\"",
     "output_json": {
       "scan": {
 	"__type__": "tensor",
