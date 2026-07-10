@@ -1,5 +1,5 @@
 // xxgemma_sft_dataset.jsonc
-// Version 0.0.1 (Time-stamp: <2026-07-10T12:46:01Z>)
+// Version 0.0.1 (Time-stamp: <2026-07-10T22:46:32Z>)
 //
 // xxLLM (JSON を出力する xLLM に対し、JSON を出力するプログラムを出力
 // する LLM) を Gemma のファインチューニングで実装する。そのプロジェク
@@ -23,7 +23,10 @@
 // License:
 //
 // 私自身は Public Domain にしたいのですが、それだと逆に扱いにくいとい
-// う場合、AI 作成に問題を関じる場合などは、MIT License でお願いします。
+// う場合、AI 作成に問題を感じる場合などは、MIT License でお願いします。
+//
+// ChatGPT 5.5 さん、Gemini 3.5 Flash さん、Gemini 3.1 Pro さん、
+// Claude Sonnet 4.6 & 5 さんにお願いして作りました。
 
 [
   // 1. 正常系（基本）：20シチュエーション (BASE-01 〜 BASE-20)

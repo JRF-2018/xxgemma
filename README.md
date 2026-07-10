@@ -1,12 +1,10 @@
 # xxGemma
 
-<!-- Time-stamp: "2026-07-09T19:30:52Z" -->
-
-**現在、建設中！**
+<!-- Time-stamp: "2026-07-10T23:10:43Z" -->
 
 xxLLM (JSON を出力する xLLM に対し、JSON を出力するプログラムを出力する LLM) を Gemma のファインチューニングで実装する。そのプロジェクトを xxGemma と呼ぶ。このデータセットはそのファインチューニング用のデータセットである。
 
-ただし、今回の実装は、相対的に能力の低い小さい Gemma による実装で、実用的な実装とは言えず、PoC (Proof of Concept) 的な実装に留まっている。もちろん、将来的には小さく早い LLM で xxLLM が十分に機能してほしいというのはあるのだが。
+ただし、今回の実装は、相対的に能力の低い小さい Gemma による実装で、実用的な実装とは言えず、PoC (Proof of Concept) 的な実装に留まっている。もちろん、将来的には小さく速い LLM で xxLLM が十分に機能してほしいというのはあるのだが。
 
 このデータセットは私が定義した DSL 仕様をもとに、Gemini 3.5 Flashさんに列挙してもらったシチュエーションを ChatGPT 5.5(?) さんに DSL プログラムにしてもらったもの。
 
@@ -40,7 +38,7 @@ plays $balls balls.
 
 この場合、出力する JSON は重要でなく、DSL プログラムがある種のルーターとして機能することを想定している。
 
-ちなみに COMMENT や「ヘッダ」にある変数定義部はある種 CoT のように機能することを期待している。この発想には、私が昔、定義部分だけ書いてプログラムを書いた気分になっていたことを思い出す。
+ちなみに COMMENT や「ヘッダ」にある変数定義部はある種 CoT のように機能することを期待している。この発想は、私が昔、定義部分だけ書いてプログラムを書いた気分になっていたことを思い出させる。
 
 
 ## ファイル
@@ -86,7 +84,13 @@ http://jrf.cocolog-nifty.com/statuses/2024/09/post-a48170.html
 
 そう半ば諦めつつ(試験的な)実装の機会をうかがっていた。
 
-AI さん達の発展の中、機は熟しつつあり、元々は、xxLLM は GPT2 レベルで試験的に実装してみるつもりでいたのだが、斎藤康毅『[ゼロから作るDeep Learning 6 - LLM編](https://www.amazon.co.jp/dp/4814401612)』を読み、そのデータセットを覗いて、そのデータ量の膨大さにいったん挫折した。しかし、それを Gemini さんに愚痴ったところ、Gemma 使えばいいじゃね？…と言われたのが、今回のプロジェクトの発端となった。
+AI さん達の発展の中、機は熟しつつあり、元々は、xxLLM は GPT2 レベルで試験的に実装してみるつもりでいたのだが、斎藤康毅『[ゼロから作るDeep Learning 6 - LLM編](https://www.amazon.co.jp/dp/4814401612)』を読み、そのデータセットを覗いて、そのデータ量の膨大さに驚き、いったん挫折した。しかし、それを Gemini さんに愚痴ったところ、Gemma 使えばいいんじゃね？…と言われたのが、今回のプロジェクトの発端となった。
+
+今後の xxGemma プロジェクトの更新情報などは↓で。  
+
+\[cocolog:96065263](2026年7月)  
+《xxGemma 実験を行った。xxLLM (JSON を出力する xLLM に対し、JSON を出力するプログラムを出力する LLM) を Google の「ローカルLLM」 Gemma のファインチューニングで実装する。そのプロジェクトを xxGemma と呼ぶ。 - JRF のひとこと》  
+http://jrf.cocolog-nifty.com/statuses/2026/07/post-ca410c.html
 
 
 ## Author
@@ -96,8 +100,9 @@ JRF ( http://jrf.cocolog-nifty.com/statuses , Twitter (X): @jion_rockford )
 
 ## License
 
-私自身は Public Domain にしたいのですが、それだと逆に扱いにくいという場合、AI 作成に問題を関じる場合などは、MIT License でお願いします。
+私自身は Public Domain にしたいのですが、それだと逆に扱いにくいという場合、AI 作成に問題を感じる場合などは、MIT License でお願いします。
 
-ChatGPT 5.5 さん、Gemini 3.5 Flash さん、Claude Sonnet 4.6 さんにお願いして作りました。
+ChatGPT 5.5 さん、Gemini 3.5 Flash さん、Gemini 3.1 Pro さん、Claude Sonnet 4.6 & 5 さんにお願いして作りました。
 
-
+----
+(This document is mainly written in Japanese/UTF8.)
