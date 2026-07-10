@@ -262,6 +262,10 @@ def split_dsl_elements(s: str) -> List[str]:
 # ==========================================
 # 3. DSL インタプリタ
 # ==========================================
+class InterpreterAbort(Exception):
+    def __init__(self, message):
+        self.message = message
+
 class xxGemmaInterpreter:
     def __init__(self):
         self.variables: Dict[str, Any] = {}
@@ -533,6 +537,8 @@ class xxGemmaInterpreter:
                 feedback = self._execute_code(code_content)
                 self.exception = None
                 return feedback
+            except InterpreterAbort:
+                raise
             except Exception as e:
                 err_msg = self.escape_feedback(str(e))
                 self.exception = err_msg
@@ -558,7 +564,7 @@ class xxGemmaInterpreter:
                 err_msg = err_msg[1:-1].strip()
             else:
                 err_msg = re.sub(r'([a-zA-Z0-9_]+):\s*["\'](.*?)["\']', r'\1: \2', err_msg)
-            raise RuntimeError(self.escape_feedback(err_msg))
+            raise InterpreterAbort(self.escape_feedback(err_msg))
 
         # --- return 文 ---
         if code.startswith("return "):
@@ -923,6 +929,8 @@ def do_gemma_4_line_by_line_inference(
 
     print("=== 🤖 xxLLM 行ごと生成ループ開始 ===")
 
+    abort = False
+    
     for line_idx in range(max_lines):
         encoded = tokenizer.apply_chat_template(
             messages,
@@ -1003,6 +1011,7 @@ def do_gemma_4_line_by_line_inference(
             # --------------------------------------------------
             if clean_line.startswith("[RESULT]"):
                 print(f"⚠️ [SYSTEM GUARD]: AIがRESULTを自己生成したため無視します: {clean_line}")
+                interpreter.last_feedback_type = None
                 continue
             if clean_line.startswith("[EXCEPTION]"):
 
@@ -1010,12 +1019,18 @@ def do_gemma_4_line_by_line_inference(
                     print(
                         f"⚠️ [SYSTEM GUARD]: EXCEPTIONのエコーバックを検出したため無視します: {clean_line}"
                     )
-
+                    interpreter.last_feedback_type = None
+                    continue
+                if interpreter.last_feedback_type == "RESULT":
+                    print(
+                        f"⚠️ [SYSTEM GUARD]: RESULTフィードバック直後のEXCEPTIONを無視します: {clean_line}"
+                    )
+                    interpreter.last_feedback_type = None
                     continue
                 print(f"⚠️ [SYSTEM GUARD]: AIが勝手にEXCEPTIONを生成しました: {clean_line}")
-                feedback_result = "[RESULT]SYSTEM_EXCEPTION_ALREADY_HANDLED"
+                feedback_result = "[SYSTEM]EXCEPTION_ALREADY_HANDLED"
                 print(f"      [SYSTEM FEEDBACK TO LLM]: {feedback_result}")
-                interpreter.last_feedback_type = "RESULT"
+                interpreter.last_feedback_type = "SYSTEM"
                 generated_lines.append(feedback_result)
                 messages[model_msg_idx]["content"].append({
                     "type": "text",
@@ -1034,7 +1049,13 @@ def do_gemma_4_line_by_line_inference(
 
             print(f"← 🛠️ [Python制御: {line_idx + 1}行目の生成終了を検知しました]")
 
-            feedback_result = interpreter.execute_line(clean_line)
+            try:
+                feedback_result = interpreter.execute_line(clean_line)
+            except InterpreterAbort as e:
+                interpreter.exception = e.message
+                print(f"    ↳ ★ DSL raise により終了: {e.message}")
+                abort = True
+                break
 
             if feedback_result:
                 print(f"    ↳ ★インタプリタによる結果を検出: {feedback_result}")
@@ -1053,6 +1074,9 @@ def do_gemma_4_line_by_line_inference(
                     "type": "text",
                     "text": feedback_result + "\n"
                 })
+
+        if abort:
+            break
 
         # EOSの検知
         if use_real_transformers:
@@ -1415,6 +1439,55 @@ This is statement 2."""
     assert "__ERROR__" in result_json_10, f"Test10 Failed: Error must be raised -> {repr(result_json_10)}"
     assert "Name 'pritn' is not defined" in result_json_10.get("__ERROR__"), f"Test10 Failed: Expected NameError, got -> {repr(result_json_10.get('__ERROR__'))}"
     print("✅ Test Case 10: PASS")
+
+
+    # --------------------------------------------------
+    # テストケース 11: raise 後は後続 DSL が実行されないことを確認
+    # --------------------------------------------------
+    print("\n--- [Test Case 11] Abort Stops Subsequent Execution ---")
+
+    scenario_11 = """[CODE]x = int 1
+[CODE]raise Error: Stop.
+[CODE]x = int 999
+This statement should never be added.
+[CODE]y = int 2"""
+
+    dummy_model_11 = DummyModel(scenario_11)
+    messages_11 = [
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Verify abort behavior."
+                }
+            ]
+        }
+    ]
+
+    result_json_11, dsl_prog_11 = do_gemma_4_line_by_line_inference(
+        messages_11,
+        dummy_tokenizer,
+        dummy_model_11
+    )
+
+    print("\n--- [Generated DSL Program] ---")
+    print(dsl_prog_11)
+    print("-------------------------------")
+
+    assert result_json_11.get("x") == 1, \
+        f"Test11 Failed: x should remain 1 -> {repr(result_json_11.get('x'))}"
+
+    assert "y" not in result_json_11, \
+        "Test11 Failed: y must not be assigned after raise."
+
+    assert result_json_11.get("__ERROR__") == "Error: Stop.", \
+        f"Test11 Failed: __ERROR__ -> {repr(result_json_11.get('__ERROR__'))}"
+
+    assert result_json_11.get("__STATEMENT__") == "", \
+        f"Test11 Failed: Statement must remain empty -> {repr(result_json_11.get('__STATEMENT__'))}"
+
+    print("✅ Test Case 11: PASS")
 
     print("\n🎉 すべてのテストケースをクリアしました！例外と回復処理 of ライフサイクル管理は完璧です。")
 
